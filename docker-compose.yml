@@ -7,13 +7,13 @@ services:
             - "4001:4000"     # Map to different ports to avoid conflicts
         networks:
             - backend-network
-    # backend2:
-    #     build:
-    #         context: ./backend-suzuki
-    #     ports:
-    #         - "4002:4000"     # Map to different ports
-    #     networks:
-    #         - backend-network
+    backend2:
+        build:
+            context: ./backend-suzuki
+        ports:
+            - "4002:4000"     # Map to different ports
+        networks:
+            - backend-network
 
     nginx:
         restart: always
