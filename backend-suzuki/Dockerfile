@@ -6,7 +6,7 @@ COPY package*.json ./
 
 COPY package.json package-lock.json ./
 
-RUN npm i --save
+RUN npm cache clean --force && npm i --save
 
 COPY . .
 

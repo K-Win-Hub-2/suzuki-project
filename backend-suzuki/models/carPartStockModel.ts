@@ -3,15 +3,19 @@ import { Carmodels } from './carModel';
 import { CarPartTitleCategoriesModels } from './carPartCategoriesModel';
 import { CarPartTitleModels } from './carPartTitle';
 import { AdminUsers } from './adminUserModel';
-
+//related with car part title 
 interface CarPartStockModel extends Document {
     isDeleted: boolean,
+    //car part title
     name: mongoose.Schema.Types.ObjectId,
     createdAt: Date,
     date: Date,
     colorCode: string,
     url: string,
     totalQuantity: number,
+    originalPrice: number,
+    discountPrice: number,
+    promotionPrice: number,
     dealerId: mongoose.Schema.Types.ObjectId
 }
 
@@ -34,6 +38,15 @@ const CarPartStockSchema: Schema<CarPartStockModel> = new Schema({
    totalQuantity: {
         type: Number,
         default: 0
+   },
+   originalPrice: {
+      type: Number
+   },
+   discountPrice: {
+      type: Number
+   },
+   promotionPrice: {
+      type: Number
    },
    dealerId: {
         type: mongoose.Schema.Types.ObjectId,

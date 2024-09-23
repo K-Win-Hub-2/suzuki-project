@@ -1,9 +1,11 @@
 import mongoose, { Document, Schema, Model } from 'mongoose'
 
+//this is the example of accessories, merchantize, maintainence to create
 interface CarPartTitleCategoriesModel extends Document {
     isDeleted: boolean,
     name: string,
-    date: Date
+    date: Date,
+    createdAt: Date
 }
 
 const CarPartTitleCategorieschema: Schema<CarPartTitleCategoriesModel> = new Schema({
@@ -16,9 +18,12 @@ const CarPartTitleCategorieschema: Schema<CarPartTitleCategoriesModel> = new Sch
         required: true,
     },
    date: {
-        type: Date,
-        default: Date.now
-   }
+        type: Date
+   },
+   createdAt: {
+    type: Date,
+    default: Date.now
+}
 });
 
 

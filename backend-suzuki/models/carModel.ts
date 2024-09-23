@@ -1,10 +1,10 @@
 import mongoose, { Document, Schema, Model } from 'mongoose'
-import bcryptHelpers from '../helpers/bcryptHelper';
 
 interface Carmodel extends Document {
     isDeleted: boolean,
     name: string,
     date: Date,
+    createdAt: Date,
     url: string,
     model_number: string
 }
@@ -20,8 +20,11 @@ const CarModelSchema: Schema<Carmodel> = new Schema({
     },
    date: {
         type: Date,
-        default: Date.now
    },
+   createdAt: {
+    type: Date,
+    default: Date.now
+    },
    url: {
     type: String,
    },
