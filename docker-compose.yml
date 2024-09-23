@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+    backend1:
+        build:
+            context: ./backend-suzuki
+        ports:
+            - "4001:4000"     # Map to different ports to avoid conflicts
+        networks:
+            - backend-network
+    # backend2:
+    #     build:
+    #         context: ./backend-suzuki
+    #     ports:
+    #         - "4002:4000"     # Map to different ports
+    #     networks:
+    #         - backend-network
+
+    nginx:
+        restart: always
+        build:
+            context: ./nginx
+        ports:
+            - "80:80"
+        depends_on:
+            - backend1
+            - backend2
+        networks:
+            - backend-network
+
+networks:
+  backend-network: 
+    driver: bridge
