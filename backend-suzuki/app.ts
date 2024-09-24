@@ -23,7 +23,7 @@ app.use(helmet())
 routeConfig.registerRoutes(app)
 //database configuration
 mongoDB.connect()
-console.log("th", env.port)
+console.log("port is", env.port)
 //if there is no api 
 app.use("*",(req,res)=>{
     if(process.env.NODE_ENV === 'development'){
