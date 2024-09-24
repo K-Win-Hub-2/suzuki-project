@@ -7,16 +7,7 @@ services:
             - "4001:4000"     # Map to different ports to avoid conflicts
         networks:
             - backend-network
-        environment:
-            - DB_URL
-            - DEVELOPMENT_DB_URL
-            - PORT
-            - SALT
-            - SECRET
-            - NODE_ENV
-            - AWS_ACCESS_KEY_ID
-            - AWS_SECRET_ACCESS_KEY
-            - BUCKET_NAME
+        env_file: .env
     backend2:
         build:
             context: ./backend-suzuki
@@ -24,16 +15,7 @@ services:
             - "4002:4000"     # Map to different ports
         networks:
             - backend-network
-        environment:
-            - DB_URL
-            - DEVELOPMENT_DB_URL
-            - PORT
-            - SALT
-            - SECRET
-            - NODE_ENV
-            - AWS_ACCESS_KEY_ID
-            - AWS_SECRET_ACCESS_KEY
-            - BUCKET_NAME
+        env_file: .env
 
     nginx:
         restart: always
