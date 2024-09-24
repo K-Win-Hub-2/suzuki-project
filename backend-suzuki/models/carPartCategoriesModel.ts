@@ -4,6 +4,7 @@ import mongoose, { Document, Schema, Model } from 'mongoose'
 interface CarPartTitleCategoriesModel extends Document {
     isDeleted: boolean,
     name: string,
+    description: string,
     date: Date,
     createdAt: Date
 }
@@ -16,6 +17,9 @@ const CarPartTitleCategorieschema: Schema<CarPartTitleCategoriesModel> = new Sch
     name: {
         type: String,
         required: true,
+    },
+    description: {
+        type: String,
     },
    date: {
         type: Date
