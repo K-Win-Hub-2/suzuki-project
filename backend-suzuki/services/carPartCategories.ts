@@ -22,18 +22,18 @@ class CarCategoriesServiceClass {
          return successResponse({ statusCode:200, message: "Car Model Created successfully", data: result})
     }
     async readById(id: mongoose.Types.ObjectId){
-          const result = await Carmodels.findById(id)
+          const result = await CarPartTitleCategoriesModels.findById(id)
           return successResponse({ statusCode:200, message: "This is Car Model by id", data: result})  
     }
     async updateById(file: any, id: mongoose.Types.ObjectId, datas: Carmodel){
         if(file){
             datas.url = file.location
          }
-         const result = await Carmodels.findByIdAndUpdate(id, datas, { new: true })
+         const result = await CarPartTitleCategoriesModels.findByIdAndUpdate(id, datas, { new: true })
          return successResponse({ statusCode:200, message: "Car Model Updated successfully", data: result})
     }
     async delete(id: mongoose.Types.ObjectId){
-            const result = await Carmodels.findByIdAndUpdate(id, { isDeleted: true }, { new: true })
+            const result = await CarPartTitleCategoriesModels.findByIdAndUpdate(id, { isDeleted: true }, { new: true })
             return successResponse({ statusCode:200, message: "Car Model deleted successfully", data: result})
     }
 }
