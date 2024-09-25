@@ -14,4 +14,5 @@ module.exports = (app: Express): void =>{
        .put(verifyToken, checkAdminType, S3UploadImage.single("car_part_title"),  catchError(updateCarPartTitle))
        .get(verifyToken, catchError(readCarPartTitle))
        .delete(verifyToken, checkAdminType, catchError(deleteCarPartTitle))
+       
 }
