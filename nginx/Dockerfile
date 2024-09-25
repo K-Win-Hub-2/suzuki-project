@@ -6,4 +6,4 @@ EXPOSE 80
 
 CMD nginx -g "daemon off;"
 
-# sed -i "" /etc/nginx/conf.d/default.conf && 
+# sed -i "" /etc/nginx/conf.d/default.conf &&   

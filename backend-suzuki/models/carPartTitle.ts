@@ -6,6 +6,7 @@ interface CarPartTitleModel extends Document {
     isDeleted: boolean,
     name: string,
     date: Date,
+    createdAt: Date,
     originalPrice: number,
     discountPrice: number,
     url: string,
@@ -26,9 +27,12 @@ const CarPartTitleSchema: Schema<CarPartTitleModel> = new Schema({
     url: {
         type: String
     },
-   date: {
+    createdAt: {
         type: Date,
         default: Date.now
+   },
+   date: {
+        type: Date
    },
    originalPrice: {
     type: Number
