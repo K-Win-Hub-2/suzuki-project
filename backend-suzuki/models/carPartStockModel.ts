@@ -9,6 +9,9 @@ interface CarPartStockModel extends Document {
     //car part title
     name: mongoose.Schema.Types.ObjectId,
     createdAt: Date,
+    partNumber: string,
+    colorName: string,
+    partName: string,
     date: Date,
     colorCode: string,
     url: string,
@@ -24,6 +27,15 @@ const CarPartStockSchema: Schema<CarPartStockModel> = new Schema({
         type: Boolean,
         default: false,
     },
+    partNumber: {
+          type: String,
+    },
+    partName: {
+          type: String 
+    },
+    colorName: {
+     type: String 
+     },
     name: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,

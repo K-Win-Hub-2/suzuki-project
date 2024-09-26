@@ -22,6 +22,11 @@ export const updateCarPartStock = async (req: Request, res: Response) => {
     res.status(data.statusCode).json(data)
 } 
 
+export const updateCarPartStockByAll = async (req: Request, res: Response) => {
+    const data = await CarPartStock.updateAll(req.file, new mongoose.Types.ObjectId(req.body.name), req.body.partNumber, req.body)
+    res.status(data.statusCode).json(data)
+} 
+
  //this is to delete
  export const deleteCarPartStock = async (req: Request, res: Response) =>{
     const data = await CarPartStock.delete(new mongoose.Types.ObjectId(req.params.id))
