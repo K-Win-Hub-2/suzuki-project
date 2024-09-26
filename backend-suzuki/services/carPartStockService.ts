@@ -43,9 +43,10 @@ class CarPartStockClass {
         if(file){
             datas.url = file.location
          }
-         let query: FilterQuery<CarPartStockModel> = {}
-         partTitleId ? query.name = partTitleId  : ""
-         partNumber? query.partNumber = partNumber : ""
+         let query: FilterQuery<CarPartStockModel> = {
+            isDeleted: false,
+            partNumber: partNumber
+         }
          const findAllStock = await CarPartStockModels.find(query)
          if(findAllStock.length > 0) {
             for(let i=0;  i < findAllStock.length; i++){

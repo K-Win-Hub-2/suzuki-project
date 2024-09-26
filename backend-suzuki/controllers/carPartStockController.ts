@@ -23,7 +23,7 @@ export const updateCarPartStock = async (req: Request, res: Response) => {
 } 
 
 export const updateCarPartStockByAll = async (req: Request, res: Response) => {
-    const data = await CarPartStock.updateAll(req.file, new mongoose.Types.ObjectId(req.body.name), req.body.partNumber, req.body)
+    const data = await CarPartStock.updateAll(req.file, new mongoose.Types.ObjectId(req.body.name), req.params.id, req.body)
     res.status(data.statusCode).json(data)
 } 
 
