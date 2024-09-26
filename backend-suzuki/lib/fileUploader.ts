@@ -23,7 +23,7 @@ const S3Storage = multerS3({
 
 function sanitizeFile(file: any, cb: any) {
     // Define the allowed extension
-    const fileExts = [".png", ".jpg", ".jpeg", ".gif"];
+    const fileExts = [".png", ".jpg", ".jpeg", ".gif", ".mp4", ".mpeg-4",".mov", ".avi", ".wmv", ".avchd", ".webm", ".flv"];
 
     // Check allowed extensions
     const isAllowedExt = fileExts.includes(
