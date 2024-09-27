@@ -21,7 +21,7 @@ export default function (err: any, req: Request, res: Response, next: NextFuncti
               res.status(403).json({
                 statusCode: 403,
                 success: false,
-                message: 'Invalid File Type. Only Png files are allowed',
+                message: 'Invalid File Type. Only Png, Jpg , Gif, Video and excel (XLSX) files are allowed',
                 data: null,
               })
             } else {

@@ -6,10 +6,11 @@ import  { AnimationMaster, AnimationMasterModel } from "../models/animationMaste
 class AnimationMasterClass {
     constructor() {}
     async listAll(datas: FilterQuery<AnimationMaster>){
-        let { type, sort } = datas
+        let { type, sort, role } = datas
         let sorted: any = { id: 1 }
         const query: FilterQuery<AnimationMaster> = { isDeleted: false }
         type ? query.type = type.toLowerCase() : ""
+        role ? query.role = role.toLowerCase() : ""
         sort ? sorted = { id: -1 } : ""
         const data = await AnimationMasterModel.find(query).sort(sorted)
         return successResponse({statusCode: 200, message: "These are all Animation datas", data: data})

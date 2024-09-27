@@ -23,17 +23,17 @@ const S3Storage = multerS3({
 
 function sanitizeFile(file: any, cb: any) {
     // Define the allowed extension
-    const fileExts = [".png", ".jpg", ".jpeg", ".gif", ".mp4", ".mpeg-4",".mov", ".avi", ".wmv", ".avchd", ".webm", ".flv"];
-
+    const fileExts = [".xlsx", "xlsx",".png", ".jpg", ".jpeg", ".gif", ".mp4", ".mpeg-4",".mov", ".avi", ".wmv", ".avchd", ".webm", ".flv"];
+    console.log("this is original name ", path.extname(file.originalname))
     // Check allowed extensions
     const isAllowedExt = fileExts.includes(
         path.extname(file.originalname.toLowerCase())
     );
 
     // Mime type must be an image
-    const isAllowedMimeType = file.mimetype.startsWith("image/");
+    // const isAllowedMimeType = file.mimetype.startsWith("image/");
 
-    if (isAllowedExt && isAllowedMimeType) {
+    if (isAllowedExt) {
         return cb(null, true); // no errors
     } else {
         // pass error msg to callback, which can be displaye in frontend

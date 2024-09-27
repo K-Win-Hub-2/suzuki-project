@@ -5,6 +5,7 @@ interface AnimationMaster extends Document {
     isDeleted: boolean,
     title: string,
     type: string,
+    role: string,
     showType: string,
     description: string,
     createdAt: Date,
@@ -21,8 +22,13 @@ const AnimationMasterSchema: Schema = new Schema({
     },
     type: {
         type: String,
-        enum: [ "login", "signup", "intro" ],
+        enum: [ "login", "signup", "intro", "homepage", "slideshow" ],
         default: "intro"
+    },
+    role: {
+        type: String,
+        enum: [ "admin", "dealer" ],
+        default: "admin"
     },
     showType: {
         type: String,

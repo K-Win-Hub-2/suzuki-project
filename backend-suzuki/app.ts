@@ -8,6 +8,7 @@ import bodyParser from "body-parser"
 import helmet from "helmet"
 import "dotenv/config";
 import CustomErrorHelper  from "./helpers/customErrorHelper"
+import { createFolder } from "./helpers/folderCreation"
 
 const app: Express = express()
 
@@ -24,6 +25,8 @@ routeConfig.registerRoutes(app)
 //database configuration
 mongoDB.connect()
 // console.log("port:", env.port)
+//create folder
+createFolder("public/excel")
 //if there is no api 
 app.use("*",(req,res)=>{
     if(process.env.NODE_ENV === 'development'){
