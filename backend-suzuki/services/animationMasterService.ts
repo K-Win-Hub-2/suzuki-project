@@ -22,12 +22,17 @@ class AnimationMasterClass {
         }
          if(files.length > 0){
             files.forEach(async(file: any) => {
+              try {
                 data.type = data.type.toLowerCase()
                 data.url = file.location
                 const animation = await AnimationMasterModel.create(data)
                 result.push(animation)
-            })
-            
+              }catch(err){
+                if(process.env.NODE_ENV === "development") {
+                    console.log("error of this is ", err)
+                }
+              }
+            })  
          }
          return successResponse({ statusCode:200, message: "Animation Data Created successfully", data: result})
     }

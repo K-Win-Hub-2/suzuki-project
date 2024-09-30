@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import AnimationMaster from "../services/animationMasterService"
 import mongoose from "mongoose"
+import catchError from "../lib/catchError"
 
 export const listAllAnimationMaster = async (req: Request, res: Response) => {
     const data = await AnimationMaster.listAll(req.query) 
