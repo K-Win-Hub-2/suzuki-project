@@ -1,14 +1,14 @@
-import mongoose, { Document, Schema, Model } from 'mongoose'
+import mongoose, { Document, Schema, Model } from "mongoose";
 
 interface DeliveryOrder extends Document {
-    isDeleted: boolean,
-    
+  isDeleted: boolean;
 }
 
-const DeliveryOrderSchema: Schema<DeliveryOrder> = new Schema({
+const DeliveryOrderSchema: Schema<DeliveryOrder> = new Schema({});
 
-})
+const DeliveryOrderModels: Model<DeliveryOrder> = mongoose.model<DeliveryOrder>(
+  "deliveryorders",
+  DeliveryOrderSchema
+);
 
-const DeliveryOrderModels: Model<DeliveryOrder> = mongoose.model<DeliveryOrder>('deliveryorders', DeliveryOrderSchema)
-
-export { DeliveryOrderModels, DeliveryOrder }
+export { DeliveryOrderModels, DeliveryOrder };
