@@ -1,12 +1,18 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 
+enum OrderStatus {
+  In_Progress = "In Progress",
+  Confirmed = "Confirmed",
+  Rejected = "Rejected",
+}
+
 interface OrderItem extends Document {
   isDeleted: boolean;
   partNumber: string;
   partName: string;
   price: number;
   quantity: number;
-  status: string;
+  status: OrderStatus;
   totalSalePrice: number;
   createdAt: Date;
   date: Date;
@@ -38,6 +44,8 @@ const OrderItemSchema: Schema<OrderItem> = new Schema({
   },
   status: {
     type: String,
+    enum: Object.values(OrderStatus),
+    default: OrderStatus.In_Progress,
   },
   totalSalePrice: {
     type: Number,
@@ -65,9 +73,11 @@ const OrderItemSchema: Schema<OrderItem> = new Schema({
   },
   qtyChangeStatus: {
     type: Boolean,
+    default: false,
   },
   priceChangeStatus: {
     type: Boolean,
+    default: false,
   },
   imgURL: {
     type: String,

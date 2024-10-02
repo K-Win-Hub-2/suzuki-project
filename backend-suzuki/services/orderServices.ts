@@ -29,15 +29,14 @@ class MainOrderClass {
     }
   }
 
-  async createOrder(
-    data: Partial<Order>,
-    orderItems: Partial<OrderItem>[],
-    files: any
-  ) {
+  async createOrder(data: Partial<Order>, orderItems: Partial<OrderItem>[]) {
     try {
       const savedOrderItems = [];
 
       for (const items of orderItems) {
+        if (typeof items !== "object" || items === null) {
+          throw new Error("OrderItem is not a valid object.");
+        }
         const orderItem = await OrderItemModels.create(items);
 
         savedOrderItems.push({
@@ -47,6 +46,7 @@ class MainOrderClass {
           price: orderItem.price,
           quantity: orderItem.quantity,
           qtyChangeStatus: orderItem.qtyChangeStatus,
+          imgURL: orderItem.imgURL,
           priceChangeStatus: orderItem.priceChangeStatus,
         });
       }
@@ -58,7 +58,7 @@ class MainOrderClass {
       const month: String = String(currentDate.getMonth() + 1).padStart(2, "0");
       const datePart: String = `${day}${month}${year}`;
 
-      const orderNumber = `SUSU-${datePart}`;
+      const orderNumber = `SHIN-${datePart}`;
 
       const orderData = { ...data, orderNumber, smallOrder: savedOrderItems };
 
@@ -70,11 +70,7 @@ class MainOrderClass {
         data: result,
       });
     } catch (error) {
-      return errorResponse({
-        statusCode: 500,
-        message: "Error creating order",
-        data: error,
-      });
+      console.error(error);
     }
   }
 
@@ -96,8 +92,22 @@ class MainOrderClass {
     }
   }
 
-  async updateOrderbyId(id: mongoose.Types.ObjectId, data: Order) {
+  async updateOrderbyId(
+    id: mongoose.Types.ObjectId,
+    data: Order,
+    OrderItem: Partial<OrderItem>
+  ) {
     try {
+      if (OrderItem && Array.isArray(OrderItem)) {
+        for (const item of OrderItem) {
+          if (item.qtyChangeStatus || item.priceChangeStatus) {
+            await OrderItemModels.findByIdAndUpdate(item._id, item, {
+              new: true,
+            });
+          }
+        }
+      }
+
       const result = await OrderModels.findByIdAndUpdate(id, data, {
         new: true,
       });

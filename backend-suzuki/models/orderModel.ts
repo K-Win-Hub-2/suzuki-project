@@ -15,6 +15,7 @@ interface OrderItemDocRef {
   qtyChangeStatus: Boolean;
   priceChangeStatus: Boolean;
   imgURL?: string;
+  status: OrderStatus;
 }
 
 interface Order extends Document {
@@ -79,35 +80,46 @@ const OrderSchema: Schema<Order> = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "deliveryorders",
   },
-  smallOrder: [
-    {
-      item_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "orderItems",
+  smallOrder: {
+    type: [
+      {
+        item_id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "orderItems",
+        },
+        partNumber: {
+          type: String,
+        },
+        partName: {
+          type: String,
+        },
+        price: {
+          type: Number,
+        },
+        status: {
+          type: String,
+          enum: Object.values(OrderStatus),
+          default: OrderStatus.In_Progress,
+        },
+        quantity: {
+          type: Number,
+        },
+        qtyChangeStatus: {
+          type: Boolean,
+          default: false,
+        },
+        priceChangeStatus: {
+          type: Boolean,
+          default: false,
+        },
+        imgURL: {
+          type: String,
+        },
       },
-      partNumber: {
-        type: String,
-      },
-      partName: {
-        type: String,
-      },
-      price: {
-        type: Number,
-      },
-      quantity: {
-        type: Number,
-      },
-      qtyChangeStatus: {
-        type: Boolean,
-      },
-      priceChangeStatus: {
-        type: Boolean,
-      },
-      imgURL: {
-        type: String,
-      },
-    },
-  ],
+    ],
+    default: [],
+    required: false,
+  },
 });
 
 const OrderModels: Model<Order> = mongoose.model<Order>("orders", OrderSchema);

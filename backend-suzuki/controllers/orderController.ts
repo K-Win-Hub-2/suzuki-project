@@ -18,33 +18,31 @@ export const getOrderById = async (req: Request, res: Response) => {
 export const createOrder = async (req: Request, res: Response) => {
   const { smallOrder } = req.body;
 
-  // const files: Express.Multer.File[] = req.files as Express.Multer.File[];
-  const data = await MainOrderClass.createOrder(
-    req.body,
-    smallOrder,
-    req.files
-  );
-  res.status(data.statusCode).json(data);
+  const files = req.files as any;
+
+  if (files && files.length > 0) {
+    files.forEach(async (file: any, index: any) => {
+      if (smallOrder[index]) {
+        smallOrder[index].imgURL = file.location;
+      }
+    });
+  }
+
+  const data = await MainOrderClass.createOrder(req.body, smallOrder);
+  res.status(data!.statusCode).json(data);
 };
 
 export const updateOrderById = async (req: Request, res: Response) => {
-  let { qtyChangeStatus, priceChangeStatus } = req.query;
+  const { smallOrder } = req.body;
 
   const updateData: Partial<Order> = {
     ...req.body,
   };
 
-  // if (qtyChangeStatus) {
-  //   updateData.qtyChangeStatus = qtyChangeStatus as string;
-  // }
-
-  // if (priceChangeStatus) {
-  //   updateData.priceChangeStatus = priceChangeStatus as string;
-  // }
-
   const data = await MainOrderClass.updateOrderbyId(
     new mongoose.Types.ObjectId(req.params.id),
-    req.body
+    req.body,
+    smallOrder
   );
 
   res.status(data.statusCode).json(data);

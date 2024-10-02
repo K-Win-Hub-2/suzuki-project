@@ -1,6 +1,7 @@
 import { Express } from "express";
 import { verifyToken } from "../middlewares/verifyToken";
 import catchError from "../lib/catchError";
+import S3UploadImage from "../lib/fileUploader";
 import {
   createOrder,
   deleteOrder,
@@ -12,8 +13,8 @@ import {
 module.exports = (app: Express): void => {
   app
     .route("/api/v1/orders")
-    .get(verifyToken, catchError(listAllOrders))
-    .post(verifyToken, catchError(createOrder));
+    .get(catchError(listAllOrders)) // Remind : Verify Token
+    .post(S3UploadImage.array("order_items"), catchError(createOrder));
 
   app
     .route("/api/v1/order/:id")

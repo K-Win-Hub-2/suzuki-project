@@ -17,7 +17,7 @@ import uploadStorage from "../lib/localFileUploader";
 module.exports = (app: Express): void => {
   app
     .route("/api/v1/car-part-stocks")
-    .get(verifyToken, catchError(listAllCarPartStock))
+    .get(catchError(listAllCarPartStock))
     .post(
       verifyToken,
       checkAdminType,
