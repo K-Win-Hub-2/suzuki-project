@@ -10,7 +10,8 @@ interface OrderItem extends Document {
   isDeleted: boolean;
   partNumber: string;
   partName: string;
-  price: number;
+  carModel: mongoose.Schema.Types.ObjectId;
+  partOriginalPrice: number;
   quantity: number;
   status: OrderStatus;
   totalSalePrice: number;
@@ -22,7 +23,15 @@ interface OrderItem extends Document {
   confirmQuantity: number;
   qtyChangeStatus: Boolean;
   priceChangeStatus: Boolean;
-  imgURL: string;
+  partImgURL: string;
+  partDescription: string;
+  partDiscountPrice: number;
+  colorName: string;
+  colorImgURL: string;
+  color: string;
+  colorOriginalPrice: number;
+  colorDiscountPercent: number;
+  colorDiscountPrice: number;
 }
 
 const OrderItemSchema: Schema<OrderItem> = new Schema({
@@ -36,11 +45,17 @@ const OrderItemSchema: Schema<OrderItem> = new Schema({
   partName: {
     type: String,
   },
-  price: {
+  carModel: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "carmodels",
+  },
+  partOriginalPrice: {
     type: Number,
+    default: 0,
   },
   quantity: {
     type: Number,
+    default: 0,
   },
   status: {
     type: String,
@@ -49,6 +64,7 @@ const OrderItemSchema: Schema<OrderItem> = new Schema({
   },
   totalSalePrice: {
     type: Number,
+    default: 0,
   },
   createdAt: {
     type: Date,
@@ -67,9 +83,11 @@ const OrderItemSchema: Schema<OrderItem> = new Schema({
   },
   availableQuantity: {
     type: Number,
+    default: 0,
   },
   confirmQuantity: {
     type: Number,
+    default: 0,
   },
   qtyChangeStatus: {
     type: Boolean,
@@ -79,8 +97,36 @@ const OrderItemSchema: Schema<OrderItem> = new Schema({
     type: Boolean,
     default: false,
   },
-  imgURL: {
+  partImgURL: {
     type: String,
+  },
+  partDescription: {
+    type: String,
+  },
+  partDiscountPrice: {
+    type: Number,
+    default: 0,
+  },
+  colorName: {
+    type: String,
+  },
+  colorImgURL: {
+    type: String,
+  },
+  color: {
+    type: String,
+  },
+  colorOriginalPrice: {
+    type: Number,
+    default: 0,
+  },
+  colorDiscountPercent: {
+    type: Number,
+    default: 0,
+  },
+  colorDiscountPrice: {
+    type: Number,
+    default: 0,
   },
 });
 

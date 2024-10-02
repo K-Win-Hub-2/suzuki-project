@@ -25,9 +25,26 @@ class OrderItemClass {
     }
   }
 
-  async createOrderItem(data: OrderItem) {
+  async createOrderItem(data: Partial<OrderItem>, files: any) {
     try {
-      const result = await OrderItemModels.create(data);
+      const partImgURL =
+        files["partImage"] && files["partImage"][0]
+          ? files["partImage"][0].location
+          : null;
+
+      const colorImgURL =
+        files["colorImage"] && files["colorImage"][0]
+          ? files["colorImage"][0].location
+          : null;
+
+      const orderItemData = {
+        ...data,
+        partImgURL,
+        colorImgURL,
+      };
+
+      const result = await OrderItemModels.create(orderItemData);
+
       return successResponse({
         statusCode: 200,
         message: "Order Item Created successfully",
@@ -60,11 +77,29 @@ class OrderItemClass {
     }
   }
 
-  async updateOrderItemById(id: mongoose.Types.ObjectId, data: OrderItem) {
+  async updateOrderItemById(
+    id: mongoose.Types.ObjectId,
+    data: OrderItem,
+    files: any
+  ) {
     try {
-      const result = await OrderItemModels.findByIdAndUpdate(id, data, {
-        new: true,
-      });
+      const colorImgURL =
+        files["colorImage"] && files["colorImage"][0]
+          ? files["colorImage"][0].location
+          : null;
+
+      const updateItemData = {
+        ...data,
+        colorImgURL,
+      };
+
+      const result = await OrderItemModels.findByIdAndUpdate(
+        id,
+        updateItemData,
+        {
+          new: true,
+        }
+      );
 
       return successResponse({
         statusCode: 200,
@@ -82,7 +117,12 @@ class OrderItemClass {
 
   async deleteOrderItem(id: mongoose.Types.ObjectId) {
     try {
-      const result = await OrderItemModels.findByIdAndDelete(id);
+      let query = {
+        _id: id,
+        isDeleted: false,
+      };
+
+      const result = await OrderItemModels.findByIdAndUpdate(query);
 
       return successResponse({
         statusCode: 200,

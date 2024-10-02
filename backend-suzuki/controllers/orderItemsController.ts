@@ -9,7 +9,8 @@ export const listAllOrderItems = async (req: Request, res: Response) => {
 };
 
 export const createOrderItem = async (req: Request, res: Response) => {
-  const data = await OrderItemClass.createOrderItem(req.body);
+  const files: any = req.files;
+  const data = await OrderItemClass.createOrderItem(req.body, files);
   res.status(data.statusCode).json(data);
 };
 
@@ -21,36 +22,11 @@ export const getOrderItemById = async (req: Request, res: Response) => {
 };
 
 export const updateOrderItemById = async (req: Request, res: Response) => {
-  let {
-    qtyChangeStatus,
-    priceChangeStatus,
-    availableQuantity,
-    confirmQuantity,
-  } = req.query;
-
-  const updateData: Partial<OrderItem> = {
-    ...req.body,
-  };
-
-  if (qtyChangeStatus) {
-    updateData.qtyChangeStatus = Boolean(qtyChangeStatus);
-  }
-
-  if (priceChangeStatus) {
-    updateData.priceChangeStatus = Boolean(priceChangeStatus);
-  }
-
-  if (availableQuantity) {
-    updateData.availableQuantity = parseInt(availableQuantity as string);
-  }
-
-  if (confirmQuantity) {
-    updateData.confirmQuantity = parseInt(confirmQuantity as string);
-  }
-
+  const files: any = req.files;
   const data = await OrderItemClass.updateOrderItemById(
     new mongoose.Types.ObjectId(req.params.id),
-    req.body
+    req.body,
+    files
   );
   res.status(data.statusCode).json(data);
 };
