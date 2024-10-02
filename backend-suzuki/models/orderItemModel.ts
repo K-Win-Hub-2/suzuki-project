@@ -14,8 +14,9 @@ interface OrderItem extends Document {
   mainOrder: mongoose.Schema.Types.ObjectId;
   availableQuantity: number;
   confirmQuantity: number;
-  qtyChangeStatus: string;
-  priceChangeStatus: string;
+  qtyChangeStatus: Boolean;
+  priceChangeStatus: Boolean;
+  imgURL: string;
 }
 
 const OrderItemSchema: Schema<OrderItem> = new Schema({
@@ -63,9 +64,12 @@ const OrderItemSchema: Schema<OrderItem> = new Schema({
     type: Number,
   },
   qtyChangeStatus: {
-    type: String,
+    type: Boolean,
   },
   priceChangeStatus: {
+    type: Boolean,
+  },
+  imgURL: {
     type: String,
   },
 });

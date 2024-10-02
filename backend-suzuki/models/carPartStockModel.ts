@@ -19,6 +19,7 @@ interface CarPartStockModel extends Document {
   originalPrice: number;
   discountPrice: number;
   promotionPrice: number;
+  carModelId: mongoose.Schema.Types.ObjectId;
   dealerId: mongoose.Schema.Types.ObjectId;
 }
 
@@ -61,6 +62,10 @@ const CarPartStockSchema: Schema<CarPartStockModel> = new Schema({
   promotionPrice: {
     type: Number,
     default: 0,
+  },
+  carModelId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: Carmodels,
   },
   dealerId: {
     type: mongoose.Schema.Types.ObjectId,

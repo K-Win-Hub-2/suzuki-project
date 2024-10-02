@@ -12,19 +12,23 @@ interface OrderItemDocRef {
   partName: string;
   price: number;
   quantity: number;
-  qtyChangeStatus: string;
-  priceChangeStatus: string;
+  qtyChangeStatus: Boolean;
+  priceChangeStatus: Boolean;
+  imgURL?: string;
 }
 
 interface Order extends Document {
   isDeleted: boolean;
+  phoneNumber: string;
+  address: string;
   orderDate: Date;
-  orderNumber: number;
+  orderNumber: string;
   customer: mongoose.Schema.Types.ObjectId;
   dealer: mongoose.Schema.Types.ObjectId;
   totalSaleAmount: number;
   totalItem: number;
   status: OrderStatus;
+  shippingMethod: string;
   deliverOrder: mongoose.Schema.Types.ObjectId;
   smallOrder: OrderItemDocRef[];
 }
@@ -34,14 +38,18 @@ const OrderSchema: Schema<Order> = new Schema({
     type: Boolean,
     default: false,
   },
+  phoneNumber: {
+    type: String,
+  },
+  address: {
+    type: String,
+  },
   orderDate: {
     type: Date,
     default: Date.now,
-    required: true,
   },
   orderNumber: {
-    type: Number,
-    required: true,
+    type: String,
   },
   customer: {
     type: mongoose.Schema.Types.ObjectId,
@@ -63,6 +71,9 @@ const OrderSchema: Schema<Order> = new Schema({
     type: String,
     enum: Object.values(OrderStatus),
     default: OrderStatus.In_Progress,
+  },
+  shippingMethod: {
+    type: String,
   },
   deliverOrder: {
     type: mongoose.Schema.Types.ObjectId,
@@ -87,9 +98,12 @@ const OrderSchema: Schema<Order> = new Schema({
         type: Number,
       },
       qtyChangeStatus: {
-        type: String,
+        type: Boolean,
       },
       priceChangeStatus: {
+        type: Boolean,
+      },
+      imgURL: {
         type: String,
       },
     },
