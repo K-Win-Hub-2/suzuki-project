@@ -7,6 +7,7 @@ import {
 } from "../models/carPartStockModel";
 import { CarPartTitleModels } from "../models/carPartTitle";
 import { AdminUsers } from "../models/adminUserModel";
+import path from "path";
 
 class CarPartStockClass {
   constructor() {}
@@ -19,7 +20,20 @@ class CarPartStockClass {
 
     //car part title
     name ? (query.name = name) : "";
-    const data = await CarPartStockModels.find(query).populate("name");
+    const data = await CarPartStockModels.find(query)
+      .populate("name")
+      .populate({
+        path: "name",
+        populate: {
+          path: "car_model",
+        },
+      })
+      .populate({
+        path: "name",
+        populate: {
+          path: "car_part_category",
+        },
+      });
 
     return successResponse({
       statusCode: 200,
