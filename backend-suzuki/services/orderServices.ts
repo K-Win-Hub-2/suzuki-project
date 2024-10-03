@@ -6,6 +6,11 @@ import { OrderFilterQuery } from "../helpers/orderListFilter";
 import { OrderItemModels, OrderItem } from "../models/orderItemModel";
 import { OrderItemDocRef } from "../models/orderModel";
 
+enum OrderStatus {
+  In_Progress = "In Progress",
+  Completed = "Completed",
+  Cancelled = "Cancelled",
+}
 class MainOrderClass {
   constructor() {}
 
@@ -34,16 +39,11 @@ class MainOrderClass {
     data: Partial<Order>,
     orderItems: Partial<OrderItemDocRef>[]
   ) {
+    console.log(orderItems);
     try {
       // Check if orderItems is array
       if (!Array.isArray(orderItems)) {
         throw new Error("Order Items must be an array");
-      }
-
-      enum OrderStatus {
-        In_Progress = "In Progress",
-        Completed = "Completed",
-        Cancelled = "Cancelled",
       }
 
       //Generate Order Number
@@ -59,7 +59,17 @@ class MainOrderClass {
       const orderData = {
         ...data,
         orderNumber,
-        smallOrder: orderItems,
+        smallOrder: orderItems.map((item) => ({
+          item_id: item.item_id,
+          partNumber: item.partNumber,
+          partName: item.partName,
+          price: item.price,
+          quantity: item.quantity,
+          qtyChangeStatus: item.qtyChangeStatus,
+          priceChangeStatus: item.priceChangeStatus,
+          status: item.status || OrderStatus.In_Progress,
+          confirmQuantity: item.confirmQuantity,
+        })),
       };
 
       const result = await OrderModels.create(orderData);
