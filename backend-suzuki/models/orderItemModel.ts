@@ -13,7 +13,7 @@ interface OrderItem extends Document {
   carModel: mongoose.Schema.Types.ObjectId;
   partOriginalPrice: number;
   quantity: number;
-  status: OrderStatus;
+  status?: OrderStatus;
   totalSalePrice: number;
   createdAt: Date;
   date: Date;

@@ -102,7 +102,7 @@ class MainOrderClass {
   async updateOrderbyId(
     id: mongoose.Types.ObjectId,
     data: Order,
-    OrderItem: Partial<OrderItem>
+    OrderItem: any
   ) {
     try {
       if (!Array.isArray(OrderItem)) {
