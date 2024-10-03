@@ -13,8 +13,10 @@ class MongoDB {
     return MongoDB.#instance;
   }
   public connect(): void {
-    const environment = process.env.NODE_ENV
-    environment === "development" ? mongoose.connect(getEnvString("DEVELOPMENT_DB_URL")) : mongoose.connect(getEnvString("DB_URL"));
+    const environment = process.env.NODE_ENV;
+    environment === "development"
+      ? mongoose.connect(getEnvString("DEVELOPMENT_DB_URL"))
+      : mongoose.connect(getEnvString("DB_URL"));
     mongoose.connection.on("error", (err) => {
       console.log(err);
     });
@@ -24,4 +26,4 @@ class MongoDB {
   }
 }
 const mongoDB = MongoDB.getInstance();
-export default mongoDB
+export default mongoDB;

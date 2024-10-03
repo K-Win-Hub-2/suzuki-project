@@ -16,10 +16,11 @@ class CarPartStockClass {
     let { dealerId, name } = datas;
 
     const query: FilterQuery<CarPartStockModel> = { isDeleted: false };
-    dealerId ? (query.dealerId = dealerId) : "";
+    if (dealerId) query.dealerId = dealerId;
 
     //car part title
-    name ? (query.name = name) : "";
+    if (name) query.name = name;
+
     const data = await CarPartStockModels.find(query)
       .populate("name")
       .populate({
