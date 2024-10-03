@@ -35,17 +35,9 @@ class MainOrderClass {
     }
   }
 
-  async createOrder(
-    data: Partial<Order>,
-    orderItems: Partial<OrderItemDocRef>[]
-  ) {
+  async createOrder(data: Partial<Order>, orderItems: any) {
     console.log(orderItems);
     try {
-      // Check if orderItems is array
-      if (!Array.isArray(orderItems)) {
-        throw new Error("Order Items must be an array");
-      }
-
       //Generate Order Number
       const currentDate: Date = new Date();
       const day: String = String(currentDate.getDay()).padStart(2, "0");
@@ -56,19 +48,22 @@ class MainOrderClass {
       const orderNumber = `SHIN-${datePart}`;
 
       // const orderData = { ...data, orderNumber, smallOrder: savedOrderItems };
+
+      const orderItems = await OrderItemModels.find().lean(); // Return plain JS objects
+
       const orderData = {
         ...data,
         orderNumber,
-        smallOrder: orderItems.map((item) => ({
-          item_id: item.item_id,
+        smallOrder: orderItems.map((item: OrderItem) => ({
+          item_id: item._id,
           partNumber: item.partNumber,
           partName: item.partName,
-          price: item.price,
+          price: item.partOriginalPrice || item.price,
           quantity: item.quantity,
           qtyChangeStatus: item.qtyChangeStatus,
           priceChangeStatus: item.priceChangeStatus,
           status: item.status || OrderStatus.In_Progress,
-          confirmQuantity: item.confirmQuantity,
+          imgURL: item.imgURL,
         })),
       };
 
