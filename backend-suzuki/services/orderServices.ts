@@ -34,7 +34,6 @@ class MainOrderClass {
     data: Partial<Order>,
     orderItems: Partial<OrderItemDocRef>[]
   ) {
-    console.log(orderItems);
     try {
       // Check if orderItems is array
       if (!Array.isArray(orderItems)) {
@@ -60,20 +59,7 @@ class MainOrderClass {
       const orderData = {
         ...data,
         orderNumber,
-        smallOrder: orderItems.map((item) => {
-          const orderItem = item as OrderItem;
-          return {
-            item_id: orderItem._id,
-            partNumber: orderItem.partNumber,
-            partName: orderItem.partName,
-            price: orderItem.partOriginalPrice,
-            quantity: orderItem.quantity,
-            qtyChangeStatus: orderItem.qtyChangeStatus,
-            priceChangeStatus: orderItem.priceChangeStatus,
-            status: orderItem.status || OrderStatus.In_Progress,
-            confirmQuantity: orderItem.confirmQuantity,
-          };
-        }),
+        smallOrder: orderItems,
       };
 
       const result = await OrderModels.create(orderData);
