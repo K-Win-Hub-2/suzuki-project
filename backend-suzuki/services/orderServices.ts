@@ -4,6 +4,7 @@ import { OrderModels, Order } from "../models/orderModel";
 import { successResponse, errorResponse } from "../helpers/responseHelper";
 import { OrderFilterQuery } from "../helpers/orderListFilter";
 import { OrderItemModels, OrderItem } from "../models/orderItemModel";
+import { OrderItemDocRef } from "../models/orderModel";
 
 class MainOrderClass {
   constructor() {}
@@ -29,7 +30,10 @@ class MainOrderClass {
     }
   }
 
-  async createOrder(data: Partial<Order>, orderItems: any) {
+  async createOrder(
+    data: Partial<Order>,
+    orderItems: Partial<OrderItemDocRef>[]
+  ) {
     console.log(orderItems);
     try {
       // Check if orderItems is array
@@ -60,7 +64,7 @@ class MainOrderClass {
           item_id: item.item_id,
           partNumber: item.partNumber,
           partName: item.partName,
-          price: item.partOriginalPrice,
+          price: item.price,
           quantity: item.quantity,
           qtyChangeStatus: item.qtyChangeStatus,
           priceChangeStatus: item.priceChangeStatus,

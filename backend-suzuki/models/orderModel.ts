@@ -128,4 +128,4 @@ const OrderSchema: Schema<Order> = new Schema({
 
 const OrderModels: Model<Order> = mongoose.model<Order>("orders", OrderSchema);
 
-export { OrderModels, Order };
+export { OrderModels, Order, OrderItemDocRef };
