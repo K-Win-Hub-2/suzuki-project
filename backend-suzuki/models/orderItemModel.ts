@@ -31,6 +31,8 @@ interface OrderItem extends Document {
   colorOriginalPrice: number;
   colorDiscountPercent: number;
   colorDiscountPrice: number;
+  price: number;
+  imgURL: string;
 }
 
 const OrderItemSchema: Schema<OrderItem> = new Schema({
