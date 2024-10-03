@@ -2,8 +2,8 @@ import mongoose, { Document, Schema, Model } from "mongoose";
 
 enum OrderStatus {
   In_Progress = "In Progress",
-  Confirmed = "Confirmed",
-  Rejected = "Rejected",
+  Completed = "Completed",
+  Cancelled = "Cancelled",
 }
 
 interface OrderItem extends Document {
@@ -18,7 +18,6 @@ interface OrderItem extends Document {
   createdAt: Date;
   date: Date;
   remark: string;
-  mainOrder: mongoose.Schema.Types.ObjectId;
   availableQuantity: number;
   confirmQuantity: number;
   qtyChangeStatus: Boolean;
@@ -57,11 +56,6 @@ const OrderItemSchema: Schema<OrderItem> = new Schema({
     type: Number,
     default: 0,
   },
-  status: {
-    type: String,
-    enum: Object.values(OrderStatus),
-    default: OrderStatus.In_Progress,
-  },
   totalSalePrice: {
     type: Number,
     default: 0,
@@ -70,38 +64,18 @@ const OrderItemSchema: Schema<OrderItem> = new Schema({
     type: Date,
     default: Date.now,
   },
-  date: {
-    type: Date,
-    default: Date.now,
-  },
   remark: {
     type: String,
-  },
-  mainOrder: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "orders",
-  },
-  availableQuantity: {
-    type: Number,
-    default: 0,
-  },
-  confirmQuantity: {
-    type: Number,
-    default: 0,
-  },
-  qtyChangeStatus: {
-    type: Boolean,
-    default: false,
-  },
-  priceChangeStatus: {
-    type: Boolean,
-    default: false,
   },
   partImgURL: {
     type: String,
   },
   partDescription: {
     type: String,
+  },
+  availableQuantity: {
+    type: Number,
+    default: 0,
   },
   partDiscountPrice: {
     type: Number,

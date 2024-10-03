@@ -18,26 +18,12 @@ export const getOrderById = async (req: Request, res: Response) => {
 export const createOrder = async (req: Request, res: Response) => {
   const { smallOrder } = req.body;
 
-  const files = req.files as any;
-
-  if (files && files.length > 0) {
-    files.forEach(async (file: any, index: any) => {
-      if (smallOrder[index]) {
-        smallOrder[index].imgURL = file.location;
-      }
-    });
-  }
-
   const data = await MainOrderClass.createOrder(req.body, smallOrder);
   res.status(data!.statusCode).json(data);
 };
 
 export const updateOrderById = async (req: Request, res: Response) => {
   const { smallOrder } = req.body;
-
-  const updateData: Partial<Order> = {
-    ...req.body,
-  };
 
   const data = await MainOrderClass.updateOrderbyId(
     new mongoose.Types.ObjectId(req.params.id),

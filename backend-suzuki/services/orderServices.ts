@@ -29,26 +29,18 @@ class MainOrderClass {
     }
   }
 
-  async createOrder(data: Partial<Order>, orderItems: Partial<OrderItem>[]) {
+  async createOrder(data: Partial<Order>, orderItems: any) {
+    console.log(orderItems);
     try {
-      const savedOrderItems = [];
+      // Check if orderItems is array
+      if (!Array.isArray(orderItems)) {
+        throw new Error("Order Items must be an array");
+      }
 
-      for (const items of orderItems) {
-        if (typeof items !== "object" || items === null) {
-          throw new Error("OrderItem is not a valid object.");
-        }
-        const orderItem = await OrderItemModels.create(items);
-
-        savedOrderItems.push({
-          items_id: orderItem._id,
-          partNumber: orderItem.partNumber,
-          partName: orderItem.partName,
-          price: orderItem.price,
-          quantity: orderItem.quantity,
-          qtyChangeStatus: orderItem.qtyChangeStatus,
-          imgURL: orderItem.imgURL,
-          priceChangeStatus: orderItem.priceChangeStatus,
-        });
+      enum OrderStatus {
+        In_Progress = "In Progress",
+        Completed = "Completed",
+        Cancelled = "Cancelled",
       }
 
       //Generate Order Number
@@ -60,7 +52,22 @@ class MainOrderClass {
 
       const orderNumber = `SHIN-${datePart}`;
 
-      const orderData = { ...data, orderNumber, smallOrder: savedOrderItems };
+      // const orderData = { ...data, orderNumber, smallOrder: savedOrderItems };
+      const orderData = {
+        ...data,
+        orderNumber,
+        smallOrder: orderItems.map((item) => ({
+          item_id: item.item_id,
+          partNumber: item.partNumber,
+          partName: item.partName,
+          price: item.partOriginalPrice,
+          quantity: item.quantity,
+          qtyChangeStatus: item.qtyChangeStatus,
+          priceChangeStatus: item.priceChangeStatus,
+          status: item.status || OrderStatus.In_Progress,
+          confirmQuantity: item.confirmQuantity,
+        })),
+      };
 
       const result = await OrderModels.create(orderData);
 
@@ -70,7 +77,7 @@ class MainOrderClass {
         data: result,
       });
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   }
 
@@ -98,19 +105,15 @@ class MainOrderClass {
     OrderItem: Partial<OrderItem>
   ) {
     try {
-      if (OrderItem && Array.isArray(OrderItem)) {
-        for (const item of OrderItem) {
-          if (item.qtyChangeStatus || item.priceChangeStatus) {
-            await OrderItemModels.findByIdAndUpdate(item._id, item, {
-              new: true,
-            });
-          }
-        }
+      if (!Array.isArray(OrderItem)) {
+        throw new Error("Order Items must be an array");
       }
 
-      const result = await OrderModels.findByIdAndUpdate(id, data, {
-        new: true,
-      });
+      const result = await OrderModels.findByIdAndUpdate(
+        id,
+        { $set: { smallOrder: OrderItem } },
+        { new: true }
+      );
 
       return successResponse({
         statusCode: 200,

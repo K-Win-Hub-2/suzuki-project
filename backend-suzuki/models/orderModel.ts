@@ -2,8 +2,8 @@ import mongoose, { Document, Schema, Model } from "mongoose";
 
 enum OrderStatus {
   In_Progress = "In Progress",
-  Confirmed = "Confirmed",
-  Rejected = "Rejected",
+  Completed = "Completed",
+  Cancelled = "Cancelled",
 }
 
 interface OrderItemDocRef {
@@ -14,8 +14,9 @@ interface OrderItemDocRef {
   quantity: number;
   qtyChangeStatus: Boolean;
   priceChangeStatus: Boolean;
-  imgURL?: string;
   status: OrderStatus;
+  confirmQuantity: number;
+  remark: string;
 }
 
 interface Order extends Document {
@@ -59,7 +60,7 @@ const OrderSchema: Schema<Order> = new Schema({
   },
   dealer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "dealers",
+    ref: "adminusers",
     required: true,
   },
   totalSaleAmount: {
@@ -112,7 +113,10 @@ const OrderSchema: Schema<Order> = new Schema({
           type: Boolean,
           default: false,
         },
-        imgURL: {
+        confirmQuantity: {
+          type: Number,
+        },
+        remark: {
           type: String,
         },
       },

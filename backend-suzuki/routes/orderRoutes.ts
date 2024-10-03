@@ -14,7 +14,7 @@ module.exports = (app: Express): void => {
   app
     .route("/api/v1/orders")
     .get(catchError(listAllOrders)) // Remind : Verify Token
-    .post(S3UploadImage.array("order_items"), catchError(createOrder));
+    .post(catchError(createOrder));
 
   app
     .route("/api/v1/order/:id")
