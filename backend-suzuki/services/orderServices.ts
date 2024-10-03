@@ -60,17 +60,20 @@ class MainOrderClass {
       const orderData = {
         ...data,
         orderNumber,
-        smallOrder: orderItems.map((item) => ({
-          item_id: item.item_id,
-          partNumber: item.partNumber,
-          partName: item.partName,
-          price: item.price,
-          quantity: item.quantity,
-          qtyChangeStatus: item.qtyChangeStatus,
-          priceChangeStatus: item.priceChangeStatus,
-          status: item.status || OrderStatus.In_Progress,
-          confirmQuantity: item.confirmQuantity,
-        })),
+        smallOrder: orderItems.map((item) => {
+          const orderItem = item as OrderItem;
+          return {
+            item_id: orderItem._id,
+            partNumber: orderItem.partNumber,
+            partName: orderItem.partName,
+            price: orderItem.partOriginalPrice,
+            quantity: orderItem.quantity,
+            qtyChangeStatus: orderItem.qtyChangeStatus,
+            priceChangeStatus: orderItem.priceChangeStatus,
+            status: orderItem.status || OrderStatus.In_Progress,
+            confirmQuantity: orderItem.confirmQuantity,
+          };
+        }),
       };
 
       const result = await OrderModels.create(orderData);
