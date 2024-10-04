@@ -92,18 +92,23 @@ class AdminAccountService {
     datas: UserDatas
   ) {
     datas.isSuperAdmin = this.isSuperAdmin;
+
     if (file) {
       datas.url = file.location;
     }
-    const formattedData = superAdminAccountDataToImplementDatabase(datas); // if email exists in update data, then search new email in database and it exists in database, return can't use two email response
+
+    const formattedData = superAdminAccountDataToImplementDatabase(datas);
+    // if email exists in update data, then search new email in database and it exists in database, return can't use two email response
     if (process.env.NODE_ENV === "development") {
       console.log("formatted", id, formattedData);
     }
+
     const result = await AdminUsers.findOneAndUpdate(
       { _id: id },
       formattedData,
       { new: true }
     );
+
     return successResponse({
       statusCode: 200,
       message: "Admin Account Updated successfully",
