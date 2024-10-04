@@ -16,6 +16,7 @@ module.exports = (app: Express): void => {
     .route("/api/v1/animation-master")
     .get(catchError(listAllAnimationMaster))
     .post(
+      verifyToken,
       checkAdminType,
       S3UploadImage.array("animation_master"),
       catchError(createAnimationMaster)
@@ -24,6 +25,7 @@ module.exports = (app: Express): void => {
   app
     .route("/api/v1/animation-master/:id")
     .put(
+      verifyToken,
       checkAdminType,
       S3UploadImage.array("animation_master"),
       catchError(updateAnimationMaster)
