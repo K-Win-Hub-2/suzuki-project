@@ -1,7 +1,7 @@
 import { FilterQuery } from "mongoose";
 import { Order } from "../models/orderModel";
 
-interface OrderFilterCriteria {
+export interface OrderFilterCriteria {
   startDate?: Date;
   endDate?: Date;
   dealer?: string;
@@ -15,7 +15,7 @@ export const OrderFilterQuery = (
 ): FilterQuery<Order> => {
   let query: FilterQuery<Order> = { isDeleted: false };
 
-  if (filter.startDate || filter.endDate) {
+  if (filter.startDate && filter.endDate) {
     query.orderDate = {};
 
     if (filter.startDate) {

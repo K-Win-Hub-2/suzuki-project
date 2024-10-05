@@ -13,7 +13,7 @@ import {
 module.exports = (app: Express): void => {
   app
     .route("/api/v1/orders")
-    .get(verifyToken, catchError(listAllOrders)) // Remind : Verify Token
+    .get(catchError(listAllOrders)) // Remind : Verify Token
     .post(verifyToken, catchError(createOrder));
 
   app

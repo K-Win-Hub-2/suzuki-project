@@ -13,7 +13,7 @@ import S3UploadImage from "../lib/fileUploader";
 module.exports = (app: Express): void => {
   app
     .route("/api/v1/order-items")
-    .get(catchError(listAllOrderItems))
+    .get(verifyToken, catchError(listAllOrderItems))
     .post(
       S3UploadImage.fields([
         { name: "partImage", maxCount: 1 },

@@ -1,27 +1,32 @@
-import mongoose, { FilterQuery } from "mongoose";
+import mongoose from "mongoose";
 import "dotenv/config";
 import { OrderModels, Order } from "../models/orderModel";
 import { successResponse, errorResponse } from "../helpers/responseHelper";
-import { OrderItemModels, OrderItem } from "../models/orderItemModel";
 import { OrderItemDocRef } from "../models/orderModel";
 import { OrderRejection } from "../helpers/orderRejectionHelper";
+import {
+  OrderFilterQuery,
+  OrderFilterCriteria,
+} from "../helpers/orderListFilter";
 
 enum OrderStatus {
   In_Progress = "In Progress",
   Completed = "Completed",
   Cancelled = "Cancelled",
 }
+
 class MainOrderClass {
   constructor() {}
 
-  async listAllOrders() {
+  async listAllOrders(filter: OrderFilterCriteria) {
     try {
-      // Make sure OrderModels exists and the correct schema is used
-      const ordersDoc = await OrderModels.find()
+      const filterQuery = OrderFilterQuery(filter);
+
+      const ordersDoc = await OrderModels.find(filterQuery)
         .populate("customer", "name phone address isBanned")
-        .populate("dealer")
         .populate({
           path: "dealer",
+          select: "name userName code isSuperAdmin address isBanned email",
           populate: {
             path: "showroom",
           },
