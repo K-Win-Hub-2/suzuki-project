@@ -2,9 +2,9 @@ import mongoose, { FilterQuery } from "mongoose";
 import "dotenv/config";
 import { OrderModels, Order } from "../models/orderModel";
 import { successResponse, errorResponse } from "../helpers/responseHelper";
-import { OrderFilterQuery } from "../helpers/orderListFilter";
 import { OrderItemModels, OrderItem } from "../models/orderItemModel";
 import { OrderItemDocRef } from "../models/orderModel";
+import { OrderRejection } from "../helpers/orderRejectionHelper";
 
 enum OrderStatus {
   In_Progress = "In Progress",
@@ -14,12 +14,18 @@ enum OrderStatus {
 class MainOrderClass {
   constructor() {}
 
-  async listAllOrders(datas: FilterQuery<Order>) {
+  async listAllOrders() {
     try {
-      const filterQuery = OrderFilterQuery(datas);
-      const ordersDoc = await OrderModels.find(filterQuery)
-        .populate("customer")
-        .populate("dealer");
+      // Make sure OrderModels exists and the correct schema is used
+      const ordersDoc = await OrderModels.find()
+        .populate("customer", "name phone address isBanned")
+        .populate("dealer")
+        .populate({
+          path: "dealer",
+          populate: {
+            path: "showroom",
+          },
+        });
 
       return successResponse({
         statusCode: 200,
@@ -27,6 +33,7 @@ class MainOrderClass {
         data: ordersDoc,
       });
     } catch (err) {
+      console.error("Error fetching orders:", err);
       return errorResponse({
         statusCode: 500,
         message: "Error fetching orders",
@@ -35,8 +42,11 @@ class MainOrderClass {
     }
   }
 
-  async createOrder(data: Partial<Order>, orderItems: any) {
-    console.log(orderItems);
+  async createOrder(
+    data: Partial<Order>
+    // orderItems: Partial<OrderItemDocRef>
+  ) {
+    // console.log(orderItems);
     try {
       //Generate Order Number
       const currentDate: Date = new Date();
@@ -49,21 +59,18 @@ class MainOrderClass {
 
       // const orderData = { ...data, orderNumber, smallOrder: savedOrderItems };
 
-      const orderItems = await OrderItemModels.find().lean(); // Return plain JS objects
-
       const orderData = {
         ...data,
         orderNumber,
-        smallOrder: orderItems.map((item: OrderItem) => ({
-          item_id: item._id,
+        smallOrder: data.smallOrder?.map((item: Partial<OrderItemDocRef>) => ({
+          item_id: item.item_id,
           partNumber: item.partNumber,
           partName: item.partName,
-          price: item.partOriginalPrice || item.price,
+          price: item.price,
           quantity: item.quantity,
-          qtyChangeStatus: item.qtyChangeStatus,
-          priceChangeStatus: item.priceChangeStatus,
-          status: item.status || OrderStatus.In_Progress,
-          imgURL: item.imgURL,
+          qtyChangeStatus: item.qtyChangeStatus ?? false, // Default if not provided
+          priceChangeStatus: item.priceChangeStatus ?? false, // Default if not provided
+          status: OrderStatus.In_Progress, // Default status
         })),
       };
 
@@ -99,23 +106,54 @@ class MainOrderClass {
 
   async updateOrderbyId(
     id: mongoose.Types.ObjectId,
-    data: Order,
-    OrderItem: any
+    status?: OrderStatus,
+    remark?: string,
+    confirmQuantity?: Number,
+    confirmPrice?: Number,
+    newItems?: OrderItemDocRef[]
   ) {
     try {
-      if (!Array.isArray(OrderItem)) {
-        throw new Error("Order Items must be an array");
+      const oldOrder = await OrderModels.findById(id);
+
+      if (!oldOrder) {
+        throw new Error("Order not found");
       }
 
-      const result = await OrderModels.findByIdAndUpdate(
-        id,
-        { $set: { smallOrder: OrderItem } },
-        { new: true }
-      );
+      if (newItems && Array.isArray(newItems)) {
+        oldOrder.smallOrder = oldOrder.smallOrder.map((orderItem: any) => {
+          const newItem = newItems.find(
+            (item) => item.item_id?.toString() === orderItem.item_id?.toString()
+          );
+
+          if (!newItem) return orderItem;
+
+          return {
+            ...orderItem,
+            status: newItem.status || orderItem.status,
+            partNumber: newItem.partNumber || orderItem.partNumber,
+            partName: newItem.partName || orderItem.partName,
+            price: newItem.price || orderItem.price,
+            quantity: newItem.quantity || orderItem.quantity,
+            qtyChangeStatus:
+              newItem.qtyChangeStatus ?? orderItem.qtyChangeStatus,
+            priceChangeStatus:
+              newItem.priceChangeStatus ?? orderItem.priceChangeStatus,
+            confirmQuantity:
+              newItem.confirmQuantity || orderItem.confirmQuantity,
+            confirmPrice: newItem.confirmPrice || orderItem.confirmPrice,
+          };
+        });
+
+        oldOrder.markModified("smallOrder");
+      }
+
+      const result = await oldOrder.save();
+
+      await OrderRejection(result, id);
 
       return successResponse({
         statusCode: 200,
-        message: "Order Updated successfully",
+        message: "Order updated successfully",
         data: result,
       });
     } catch (error) {
@@ -129,9 +167,12 @@ class MainOrderClass {
 
   async deleteOrder(id: mongoose.Types.ObjectId) {
     try {
-      const result = await OrderModels.deleteOne({
+      let query = {
         _id: id,
-      });
+        isDeleted: false,
+      };
+
+      const result = await OrderModels.findByIdAndUpdate(query);
 
       return successResponse({
         statusCode: 200,

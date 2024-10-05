@@ -1,4 +1,6 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
+import { AdminUsers } from "./adminUserModel";
+import Customers from "./customerModel";
 
 enum OrderStatus {
   In_Progress = "In Progress",
@@ -10,13 +12,14 @@ interface OrderItemDocRef {
   item_id: mongoose.Schema.Types.ObjectId;
   partNumber: string;
   partName: string;
-  price: number;
-  quantity: number;
+  price: Number;
+  quantity: Number;
   qtyChangeStatus: Boolean;
   priceChangeStatus: Boolean;
   status: OrderStatus;
-  confirmQuantity: number;
-  remark: string;
+  confirmQuantity?: Number;
+  confirmPrice?: Number;
+  remark?: string;
 }
 
 interface Order extends Document {
@@ -55,12 +58,12 @@ const OrderSchema: Schema<Order> = new Schema({
   },
   customer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "customers",
+    ref: Customers,
     required: true,
   },
   dealer: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "adminusers",
+    ref: AdminUsers,
     required: true,
   },
   totalSaleAmount: {

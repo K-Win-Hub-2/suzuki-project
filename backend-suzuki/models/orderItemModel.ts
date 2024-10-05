@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
+import { Carmodels } from "./carModel";
 
 enum OrderStatus {
   In_Progress = "In Progress",
@@ -8,31 +9,31 @@ enum OrderStatus {
 
 interface OrderItem extends Document {
   isDeleted: boolean;
-  partNumber: string;
-  partName: string;
-  carModel: mongoose.Schema.Types.ObjectId;
-  partOriginalPrice: number;
-  quantity: number;
+  partNumber?: string;
+  partName?: string;
+  carModel?: mongoose.Schema.Types.ObjectId;
+  partOriginalPrice?: number;
+  quantity?: number;
   status?: OrderStatus;
-  totalSalePrice: number;
+  totalSalePrice?: number;
   createdAt: Date;
   date: Date;
   remark: string;
-  availableQuantity: number;
-  confirmQuantity: number;
-  qtyChangeStatus: Boolean;
-  priceChangeStatus: Boolean;
-  partImgURL: string;
-  partDescription: string;
-  partDiscountPrice: number;
-  colorName: string;
-  colorImgURL: string;
-  color: string;
-  colorOriginalPrice: number;
-  colorDiscountPercent: number;
-  colorDiscountPrice: number;
-  price: number;
-  imgURL: string;
+  availableQuantity?: number;
+  confirmQuantity?: number;
+  qtyChangeStatus?: Boolean;
+  priceChangeStatus?: Boolean;
+  partImgURL?: string;
+  partDescription?: string;
+  partDiscountPrice?: number;
+  colorName?: string;
+  colorImgURL?: string;
+  color?: string;
+  colorOriginalPrice?: number;
+  colorDiscountPercent?: number;
+  colorDiscountPrice?: number;
+  price?: number;
+  imgURL?: string;
 }
 
 const OrderItemSchema: Schema<OrderItem> = new Schema({
@@ -48,7 +49,7 @@ const OrderItemSchema: Schema<OrderItem> = new Schema({
   },
   carModel: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "carmodels",
+    ref: Carmodels,
   },
   partOriginalPrice: {
     type: Number,
