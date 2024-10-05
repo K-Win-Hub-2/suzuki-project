@@ -71,7 +71,21 @@ class CarPartStockClass {
   }
 
   async readById(id: mongoose.Types.ObjectId) {
-    const result = await CarPartStockModels.findById(id);
+    const result = await CarPartStockModels.findById(id)
+      .populate("name")
+      .populate({
+        path: "name",
+        populate: {
+          path: "car_model",
+        },
+      })
+      .populate({
+        path: "name",
+        populate: {
+          path: "car_part_category",
+        },
+      });
+
     return successResponse({
       statusCode: 200,
       message: "This is Car Part Stock by id",
