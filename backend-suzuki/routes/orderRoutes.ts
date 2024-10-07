@@ -14,11 +14,11 @@ module.exports = (app: Express): void => {
   app
     .route("/api/v1/orders")
     .get(catchError(listAllOrders)) // Remind : Verify Token
-    .post(verifyToken, catchError(createOrder));
+    .post(catchError(createOrder));
 
   app
     .route("/api/v1/order/:id")
-    .put(verifyToken, catchError(updateOrderById))
+    .put(catchError(updateOrderById))
     .get(verifyToken, catchError(getOrderById))
     .delete(verifyToken, catchError(deleteOrder));
 };

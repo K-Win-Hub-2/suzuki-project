@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 import { AdminUsers } from "./adminUserModel";
 import Customers from "./customerModel";
+import { CarPartStockModels } from "./carPartStockModel";
 
 enum OrderStatus {
   In_Progress = "In Progress",
@@ -10,10 +11,8 @@ enum OrderStatus {
 
 interface OrderItemDocRef {
   item_id: mongoose.Schema.Types.ObjectId;
-  partNumber: string;
-  partName: string;
-  price: Number;
-  quantity: Number;
+  orderQuantity: Number;
+  totalPrice: Number;
   qtyChangeStatus: Boolean;
   priceChangeStatus: Boolean;
   status: OrderStatus;
@@ -89,23 +88,17 @@ const OrderSchema: Schema<Order> = new Schema({
       {
         item_id: {
           type: mongoose.Schema.Types.ObjectId,
-          ref: "orderItems",
-        },
-        partNumber: {
-          type: String,
-        },
-        partName: {
-          type: String,
-        },
-        price: {
-          type: Number,
+          ref: CarPartStockModels,
         },
         status: {
           type: String,
           enum: Object.values(OrderStatus),
           default: OrderStatus.In_Progress,
         },
-        quantity: {
+        totalPrice: {
+          type: Number,
+        },
+        orderQuantity: {
           type: Number,
         },
         qtyChangeStatus: {
@@ -117,6 +110,9 @@ const OrderSchema: Schema<Order> = new Schema({
           default: false,
         },
         confirmQuantity: {
+          type: Number,
+        },
+        confirmPrice: {
           type: Number,
         },
         remark: {

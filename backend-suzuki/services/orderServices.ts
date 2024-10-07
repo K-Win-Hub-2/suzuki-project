@@ -8,6 +8,9 @@ import {
   OrderFilterQuery,
   OrderFilterCriteria,
 } from "../helpers/orderListFilter";
+import { io } from "../app";
+import { NotificationModels } from "../models/notificationModel";
+import { CarPartStockModels } from "../models/carPartStockModel";
 
 enum OrderStatus {
   In_Progress = "In Progress",
@@ -30,7 +33,8 @@ class MainOrderClass {
           populate: {
             path: "showroom",
           },
-        });
+        })
+        .populate("smallOrder.item_id");
 
       return successResponse({
         statusCode: 200,
@@ -64,22 +68,52 @@ class MainOrderClass {
 
       // const orderData = { ...data, orderNumber, smallOrder: savedOrderItems };
 
+      const totalItem =
+        data.smallOrder?.reduce(
+          (sum, item) => sum + Number(item.orderQuantity || 0),
+          0
+        ) || 0;
+
+      const totalSaleAmt =
+        data.smallOrder?.reduce(
+          (sum, item) => sum + Number(item.totalPrice || 0),
+          0
+        ) || 0;
+
       const orderData = {
         ...data,
         orderNumber,
+        totalItem,
+        totalSaleAmount: totalSaleAmt,
         smallOrder: data.smallOrder?.map((item: Partial<OrderItemDocRef>) => ({
           item_id: item.item_id,
-          partNumber: item.partNumber,
-          partName: item.partName,
-          price: item.price,
-          quantity: item.quantity,
-          qtyChangeStatus: item.qtyChangeStatus ?? false, // Default if not provided
-          priceChangeStatus: item.priceChangeStatus ?? false, // Default if not provided
-          status: OrderStatus.In_Progress, // Default status
+          orderQuantity: item.orderQuantity,
+          totalPrice: item.totalPrice,
+          qtyChangeStatus: item.qtyChangeStatus ?? false,
+          priceChangeStatus: item.priceChangeStatus ?? false,
+          status: OrderStatus.In_Progress,
         })),
       };
 
       const result = await OrderModels.create(orderData);
+
+      console.log("Order created successfully");
+
+      // io.emit("orderCreated", {
+      //   message: "New Order Created",
+      //   order: result,
+      // });
+
+      // // Create notification
+      // const notification = new NotificationModels({
+      //   title: "New Order Created",
+      //   message: "New Order Created",
+      //   order_id: result._id,
+      //   dealer_id: result.dealer,
+      //   customer_id: result.customer,
+      // });
+
+      // await notification.save();
 
       return successResponse({
         statusCode: 200,
@@ -111,10 +145,6 @@ class MainOrderClass {
 
   async updateOrderbyId(
     id: mongoose.Types.ObjectId,
-    status?: OrderStatus,
-    remark?: string,
-    confirmQuantity?: Number,
-    confirmPrice?: Number,
     newItems?: OrderItemDocRef[]
   ) {
     try {
@@ -125,29 +155,43 @@ class MainOrderClass {
       }
 
       if (newItems && Array.isArray(newItems)) {
-        oldOrder.smallOrder = oldOrder.smallOrder.map((orderItem: any) => {
-          const newItem = newItems.find(
-            (item) => item.item_id?.toString() === orderItem.item_id?.toString()
-          );
+        oldOrder.smallOrder = await Promise.all(
+          oldOrder.smallOrder.map(async (orderItem: any) => {
+            const newItem = newItems.find(
+              (item) =>
+                item.item_id?.toString() === orderItem.item_id?.toString()
+            );
 
-          if (!newItem) return orderItem;
+            if (!newItem) return orderItem;
 
-          return {
-            ...orderItem,
-            status: newItem.status || orderItem.status,
-            partNumber: newItem.partNumber || orderItem.partNumber,
-            partName: newItem.partName || orderItem.partName,
-            price: newItem.price || orderItem.price,
-            quantity: newItem.quantity || orderItem.quantity,
-            qtyChangeStatus:
-              newItem.qtyChangeStatus ?? orderItem.qtyChangeStatus,
-            priceChangeStatus:
-              newItem.priceChangeStatus ?? orderItem.priceChangeStatus,
-            confirmQuantity:
-              newItem.confirmQuantity || orderItem.confirmQuantity,
-            confirmPrice: newItem.confirmPrice || orderItem.confirmPrice,
-          };
-        });
+            if (newItem.status === OrderStatus.Completed) {
+              const carPartDoc = await CarPartStockModels.findById(
+                orderItem.item_id
+              );
+
+              if (!carPartDoc) {
+                throw new Error("Car Part not found");
+              }
+
+              carPartDoc.totalQuantity -= Number(newItem.confirmQuantity || 0);
+
+              await carPartDoc.save();
+            }
+
+            return {
+              ...orderItem,
+              status: newItem.status || orderItem.status,
+              orderQuantity: newItem.orderQuantity || orderItem.orderQuantity,
+              qtyChangeStatus:
+                newItem.qtyChangeStatus ?? orderItem.qtyChangeStatus,
+              priceChangeStatus:
+                newItem.priceChangeStatus ?? orderItem.priceChangeStatus,
+              confirmQuantity:
+                newItem.confirmQuantity || orderItem.confirmQuantity,
+              confirmPrice: newItem.confirmPrice || orderItem.confirmPrice,
+            };
+          })
+        );
 
         oldOrder.markModified("smallOrder");
       }

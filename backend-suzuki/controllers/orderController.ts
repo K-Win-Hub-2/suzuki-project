@@ -35,14 +35,10 @@ export const createOrder = async (req: Request, res: Response) => {
 };
 
 export const updateOrderById = async (req: Request, res: Response) => {
-  const { status, remark, newItems, confirmQuantity, confirmPrice } = req.body;
+  const { newItems } = req.body;
 
   const data = await MainOrderClass.updateOrderbyId(
     new mongoose.Types.ObjectId(req.params.id),
-    status,
-    remark,
-    confirmQuantity,
-    confirmPrice,
     newItems
   );
 
