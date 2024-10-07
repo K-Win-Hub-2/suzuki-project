@@ -127,7 +127,16 @@ class MainOrderClass {
 
   async getOrderById(id: mongoose.Types.ObjectId) {
     try {
-      const result = await OrderModels.findById(id);
+      const result = await OrderModels.findById(id)
+        .populate("customer", "name phone address isBanned")
+        .populate({
+          path: "dealer",
+          select: "name userName code isSuperAdmin address isBanned email",
+          populate: {
+            path: "showroom",
+          },
+        })
+        .populate("smallOrder.item_id");
 
       return successResponse({
         statusCode: 200,
