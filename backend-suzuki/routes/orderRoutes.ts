@@ -13,12 +13,12 @@ import {
 module.exports = (app: Express): void => {
   app
     .route("/api/v1/orders")
-    .get(catchError(listAllOrders)) // Remind : Verify Token
-    .post(catchError(createOrder));
+    .get(verifyToken, catchError(listAllOrders)) // Remind : Verify Token
+    .post(verifyToken, catchError(createOrder));
 
   app
     .route("/api/v1/order/:id")
-    .put(catchError(updateOrderById))
+    .put(verifyToken, catchError(updateOrderById))
     .get(verifyToken, catchError(getOrderById))
     .delete(verifyToken, catchError(deleteOrder));
 };
