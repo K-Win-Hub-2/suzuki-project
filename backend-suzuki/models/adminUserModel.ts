@@ -9,7 +9,7 @@ interface AdminUser extends Document {
   isDeleted: boolean;
   showroom: mongoose.Schema.Types.ObjectId;
   name: string;
-  // email?: string;
+  email?: string;
   password: string;
   phone: string;
   address: string;
@@ -48,10 +48,9 @@ const AdminUserSchema: Schema = new Schema({
   name: {
     type: String,
   },
-  // email: {
-  //   type: String,
-  //   unique: true,
-  // },
+  email: {
+    type: String,
+  },
   password: {
     type: String,
     required: true,
@@ -107,12 +106,14 @@ const AdminUserSchema: Schema = new Schema({
 });
 
 AdminUserSchema.pre<AdminUser>("save", async function (next) {
-  // const emailValidation = bcryptHelpers.validateEmail(this.email);
+  const emailValidation = this.email
+    ? bcryptHelpers.validateEmail(this.email)
+    : false;
   const passwordValidation = bcryptHelpers.validatePassword(this.password);
 
-  // if (!emailValidation) {
-  //   return next(new Error("Email should contain @"));
-  // }
+  if (!emailValidation) {
+    return next(new Error("Email should contain @"));
+  }
 
   if (!passwordValidation) {
     return next(

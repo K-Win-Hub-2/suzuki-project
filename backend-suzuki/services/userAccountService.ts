@@ -56,13 +56,13 @@ class AdminAccountService {
   public async create(file: any, data: AdminUser) {
     data.isSuperAdmin = this.isSuperAdmin;
     // search account for this email exist or not
-    // const searchAccount = await AdminUsers.findOne({ email: data.email });
-    // if (searchAccount)
-    //   return errorResponse({
-    //     statusCode: 201,
-    //     message: "This email is already taken",
-    //     data: null,
-    //   });
+    const searchAccount = await AdminUsers.findOne({ email: data.email });
+    if (searchAccount)
+      return errorResponse({
+        statusCode: 201,
+        message: "This email is already taken",
+        data: null,
+      });
 
     if (process.env.NODE_ENV === "development") {
       console.log("admin formatted", data);
