@@ -32,6 +32,16 @@ class NotificationClass {
 
   async getUnreadNotificationForUser(userId: mongoose.Types.ObjectId) {
     try {
+      const unreadNotifications = await NotificationModels.find({
+        customer_id: userId,
+        isRead: false,
+      }).sort({ createdAt: -1 });
+
+      return successResponse({
+        statusCode: 200,
+        message: "Unread notifications fetched successfully",
+        data: unreadNotifications,
+      });
     } catch (error) {
       return errorResponse({
         statusCode: 500,

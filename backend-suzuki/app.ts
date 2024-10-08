@@ -10,6 +10,7 @@ import "dotenv/config";
 import CustomErrorHelper from "./helpers/customErrorHelper";
 import { createFolder } from "./helpers/folderCreation";
 import { Server as socketIOServer } from "socket.io";
+import NotificationClass from "./services/notificationServices";
 
 const app: Express = express();
 
@@ -57,8 +58,22 @@ app.use(CustomErrorHelper);
 io.on("connection", (socket) => {
   console.log("A user connected " + socket.id);
 
+  socket.on("user-online", async (userId) => {
+    try {
+      const unreadNoti = await NotificationClass.getUnreadNotificationForUser(
+        userId
+      );
+
+      if (unreadNoti.statusCode === 200) {
+        socket.emit("unread-notifications", unreadNoti.data);
+      }
+    } catch (error) {
+      console.error("Error marking notification as read", error);
+    }
+  });
+
   socket.on("send-notification", (data) => {
-    console.log("Notification Recieved", data);
+    console.log("Notification received:", data);
 
     io.emit("receive-notification", data);
   });

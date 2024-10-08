@@ -55,20 +55,23 @@ class AdminAccountService {
 
   public async create(file: any, data: AdminUser) {
     data.isSuperAdmin = this.isSuperAdmin;
-    //search account for this email exist or not
-    const searchAccount = await AdminUsers.findOne({ email: data.email });
-    if (searchAccount)
-      return errorResponse({
-        statusCode: 201,
-        message: "This email is already taken",
-        data: null,
-      });
+    // search account for this email exist or not
+    // const searchAccount = await AdminUsers.findOne({ email: data.email });
+    // if (searchAccount)
+    //   return errorResponse({
+    //     statusCode: 201,
+    //     message: "This email is already taken",
+    //     data: null,
+    //   });
+
     if (process.env.NODE_ENV === "development") {
       console.log("admin formatted", data);
     }
+
     if (file) {
       data.url = file.location;
     }
+
     const result = await AdminUsers.create(data);
     return successResponse({
       statusCode: 200,
@@ -139,6 +142,7 @@ class CustomerAccountService {
     }
     return result;
   }
+
   public async listAll() {
     const users = await Customers.find().select("-password");
     return successResponse({
@@ -147,6 +151,7 @@ class CustomerAccountService {
       data: users,
     });
   }
+
   public async create(file: any, data: CustomerData) {
     if (file) {
       data.url = file.location;
@@ -162,6 +167,7 @@ class CustomerAccountService {
         message: "This email is already taken",
         data: null,
       });
+
     const result = await Customers.create(formattedData);
     return successResponse({
       statusCode: 200,
@@ -169,6 +175,7 @@ class CustomerAccountService {
       data: result,
     });
   }
+
   public async readById(id: mongoose.Types.ObjectId) {
     const result = await Customers.findById(id);
     return successResponse({

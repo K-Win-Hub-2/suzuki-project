@@ -51,11 +51,7 @@ class MainOrderClass {
     }
   }
 
-  async createOrder(
-    data: Partial<Order>
-    // orderItems: Partial<OrderItemDocRef>
-  ) {
-    // console.log(orderItems);
+  async createOrder(data: Partial<Order>) {
     try {
       //Generate Order Number
       const currentDate: Date = new Date();
@@ -65,8 +61,6 @@ class MainOrderClass {
       const datePart: String = `${day}${month}${year}`;
 
       const orderNumber = `SHIN-${datePart}`;
-
-      // const orderData = { ...data, orderNumber, smallOrder: savedOrderItems };
 
       const totalItem =
         data.smallOrder?.reduce(
@@ -99,21 +93,21 @@ class MainOrderClass {
 
       console.log("Order created successfully");
 
-      // io.emit("orderCreated", {
-      //   message: "New Order Created",
-      //   order: result,
-      // });
+      io.emit("orderCreated", {
+        message: "New Order Created",
+        order: result,
+      });
 
-      // // Create notification
-      // const notification = new NotificationModels({
-      //   title: "New Order Created",
-      //   message: "New Order Created",
-      //   order_id: result._id,
-      //   dealer_id: result.dealer,
-      //   customer_id: result.customer,
-      // });
+      // Create notification
+      const notification = new NotificationModels({
+        title: "New Order Created",
+        message: `Order ${result.orderNumber} has been placed`,
+        order_id: result._id,
+        dealer_id: result.dealer,
+        customer_id: result.customer,
+      });
 
-      // await notification.save();
+      await notification.save();
 
       return successResponse({
         statusCode: 200,
@@ -163,6 +157,23 @@ class MainOrderClass {
         throw new Error("Order not found");
       }
 
+      console.log("new items", newItems);
+
+      const totalItem =
+        newItems?.reduce(
+          (sum, item) => sum + Number(item.orderQuantity || 0),
+          0
+        ) || 0;
+
+      const totalSaleAmt =
+        newItems?.reduce(
+          (sum, item) => sum + Number(item.totalPrice || 0),
+          0
+        ) || 0;
+
+      oldOrder.totalItem = totalItem;
+      oldOrder.totalSaleAmount = totalSaleAmt;
+
       if (newItems && Array.isArray(newItems)) {
         oldOrder.smallOrder = await Promise.all(
           oldOrder.smallOrder.map(async (orderItem: any) => {
@@ -198,6 +209,7 @@ class MainOrderClass {
               confirmQuantity:
                 newItem.confirmQuantity || orderItem.confirmQuantity,
               confirmPrice: newItem.confirmPrice || orderItem.confirmPrice,
+              remark: newItem.remark || orderItem.remark,
             };
           })
         );
@@ -206,6 +218,8 @@ class MainOrderClass {
       }
 
       const result = await oldOrder.save();
+
+      console.log("Result", result);
 
       await OrderRejection(result, id);
 

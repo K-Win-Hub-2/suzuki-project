@@ -4,7 +4,7 @@ interface UserDatas {
   name: string | null;
   userName: string | null;
   code: string | null;
-  email: string | null;
+  // email?: string | null;
   password: string | null;
   phone: string | null;
   address: string | null;
@@ -35,7 +35,7 @@ const superAdminAccountDataToImplementDatabase = (
     userName: data.userName,
     showroom: data.showroom,
     code: data.code,
-    email: data.email,
+    // email: data.email,
     password: data.password,
     phone: data.phone,
     address: data.address,
@@ -50,7 +50,7 @@ const superAdminAccountDataToImplementDatabase = (
 
 interface CustomerData {
   name: string | null;
-  email: string | null;
+  email?: string | null;
   password: string | null;
   phone: string | null;
   address: string | null;
