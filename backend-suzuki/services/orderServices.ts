@@ -60,7 +60,7 @@ class MainOrderClass {
       const month: String = String(currentDate.getMonth() + 1).padStart(2, "0");
       const datePart: String = `${day}${month}${year}`;
 
-      const orderNumber = `SHIN-${datePart}`;
+      const orderNumber = `Suzuki-${datePart}`;
 
       const totalItem =
         data.smallOrder?.reduce(
