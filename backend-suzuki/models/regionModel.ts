@@ -21,7 +21,6 @@ enum RegionEnum {
 interface Region extends Document {
   region: String;
   isDeleted: Boolean;
-  townShip: String;
   dealerId: mongoose.Schema.Types.ObjectId[];
 }
 
@@ -33,9 +32,6 @@ const RegionSchema: Schema<Region> = new Schema({
   isDeleted: {
     type: Boolean,
     default: false,
-  },
-  townShip: {
-    type: String,
   },
   dealerId: [
     {

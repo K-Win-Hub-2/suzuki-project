@@ -2,6 +2,7 @@ import mongoose, { Document, Schema, Model } from "mongoose";
 import bcryptHelpers from "../helpers/bcryptHelper";
 import { Showrooms } from "./showroomModel";
 import { RegionsModels } from "./regionModel";
+import { TownShipModels } from "./newTownShipModel";
 
 interface AdminUser extends Document {
   isSuperAdmin: boolean;
@@ -14,7 +15,7 @@ interface AdminUser extends Document {
   password: string;
   phone: string;
   address: string;
-  townShip: string;
+  townShip?: mongoose.Schema.Types.ObjectId;
   region?: mongoose.Schema.Types.ObjectId;
   createdAt: Date;
   isBanned: boolean;
@@ -64,7 +65,8 @@ const AdminUserSchema: Schema = new Schema({
     type: String,
   },
   townShip: {
-    type: String,
+    type: mongoose.Types.ObjectId,
+    ref: TownShipModels,
   },
   region: {
     type: mongoose.Types.ObjectId,

@@ -49,7 +49,7 @@ export const deleteUser = async (req: Request, res: Response) => {
 };
 
 export const listDealers = async (req: Request, res: Response) => {
-  const { regionId } = req.query;
+  const { regionId, townShipId } = req.query;
 
   const FilterQuery: any = {
     isSuperAdmin: false,
@@ -60,7 +60,13 @@ export const listDealers = async (req: Request, res: Response) => {
     FilterQuery["region"] = regionId;
   }
 
-  const dealers = await AdminUsers.find(FilterQuery);
+  if (townShipId) {
+    FilterQuery["townShip"] = townShipId;
+  }
+
+  const dealers = await AdminUsers.find(FilterQuery)
+    .select("-password")
+    .populate("region townShip");
 
   res.status(200).json({
     statusCode: 200,

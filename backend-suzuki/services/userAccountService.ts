@@ -9,6 +9,7 @@ import { AdminUser, AdminUsers } from "../models/adminUserModel";
 import Customers from "../models/customerModel";
 import mongoose from "mongoose";
 import { RegionsModels } from "../models/regionModel";
+import { TownShipModels } from "../models/newTownShipModel";
 import "dotenv/config";
 
 //Factory Pattern For Account
@@ -100,6 +101,44 @@ class AdminAccountService {
       }
     }
 
+    if (
+      !this.isSuperAdmin &&
+      data.townShip &&
+      typeof data.townShip === "string"
+    ) {
+      let townShipDoc = await TownShipModels.findOne({
+        townShip: data.townShip,
+      });
+
+      if (townShipDoc) {
+        if (!townShipDoc.dealerId) {
+          townShipDoc.dealerId = [];
+        }
+
+        const townShipIdToPush =
+          data._id as any as mongoose.Schema.Types.ObjectId;
+
+        if (!townShipDoc.dealerId.includes(townShipIdToPush)) {
+          townShipDoc.dealerId.push(townShipIdToPush);
+        }
+
+        await townShipDoc.save();
+
+        data.townShip =
+          townShipDoc._id as any as mongoose.Schema.Types.ObjectId;
+      } else {
+        townShipDoc = new TownShipModels({
+          townShip: data.townShip,
+          dealerId: [data._id as any as mongoose.Schema.Types.ObjectId],
+        });
+
+        await townShipDoc.save();
+
+        data.townShip =
+          townShipDoc._id as any as mongoose.Schema.Types.ObjectId;
+      }
+    }
+
     if (process.env.NODE_ENV === "development") {
       console.log("admin formatted", data);
     }
@@ -163,6 +202,35 @@ class AdminAccountService {
       }
 
       formattedData.region = regionDoc._id;
+    }
+
+    if (datas.townShip && typeof datas.townShip === "string") {
+      let townShipDoc = await TownShipModels.findOne({
+        townShip: datas.townShip,
+      });
+
+      if (townShipDoc) {
+        if (!townShipDoc.dealerId) {
+          townShipDoc.dealerId = [];
+        }
+
+        const townShipIdToPush = id as any as mongoose.Schema.Types.ObjectId;
+
+        if (!townShipDoc.dealerId.includes(townShipIdToPush)) {
+          townShipDoc.dealerId.push(townShipIdToPush);
+        }
+
+        await townShipDoc.save();
+      } else {
+        townShipDoc = new TownShipModels({
+          townShip: datas.townShip,
+          dealerId: [id as any as mongoose.Schema.Types.ObjectId],
+        });
+
+        await townShipDoc.save();
+      }
+
+      formattedData.townShip = townShipDoc._id;
     }
 
     const result = await AdminUsers.findOneAndUpdate(
