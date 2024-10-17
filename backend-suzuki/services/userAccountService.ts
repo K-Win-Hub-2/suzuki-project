@@ -8,6 +8,7 @@ import { errorResponse, successResponse } from "../helpers/responseHelper";
 import { AdminUser, AdminUsers } from "../models/adminUserModel";
 import Customers from "../models/customerModel";
 import mongoose from "mongoose";
+import { RegionsModels } from "../models/regionModel";
 import "dotenv/config";
 
 //Factory Pattern For Account
@@ -55,8 +56,10 @@ class AdminAccountService {
 
   public async create(file: any, data: AdminUser) {
     data.isSuperAdmin = this.isSuperAdmin;
-    // search account for this email exist or not
-    console.log("data", data);
+
+    if (process.env.NODE_ENV === "development") {
+      console.log("req data", data);
+    }
 
     const searchAccount = await AdminUsers.findOne({ email: data.email });
 
@@ -67,13 +70,35 @@ class AdminAccountService {
         data: null,
       });
 
-    // if (!this.isSuperAdmin && !data.email) {
-    //   return errorResponse({
-    //     statusCode: 400,
-    //     message: "Email is required for dealers",
-    //     data: null,
-    //   });
-    // }
+    if (!this.isSuperAdmin && data.region && typeof data.region === "string") {
+      let regionDoc = await RegionsModels.findOne({ region: data.region });
+
+      if (regionDoc) {
+        if (!regionDoc.dealerId) {
+          regionDoc.dealerId = [];
+        }
+
+        const objectIdToPush =
+          data._id as any as mongoose.Schema.Types.ObjectId;
+
+        if (!regionDoc.dealerId.includes(objectIdToPush)) {
+          regionDoc.dealerId.push(objectIdToPush);
+        }
+
+        await regionDoc.save();
+
+        data.region = regionDoc._id as any as mongoose.Schema.Types.ObjectId;
+      } else {
+        regionDoc = new RegionsModels({
+          region: data.region,
+          dealerId: [data._id as any as mongoose.Schema.Types.ObjectId],
+        });
+
+        await regionDoc.save();
+
+        data.region = regionDoc._id as any as mongoose.Schema.Types.ObjectId;
+      }
+    }
 
     if (process.env.NODE_ENV === "development") {
       console.log("admin formatted", data);
@@ -111,10 +136,33 @@ class AdminAccountService {
       datas.url = file.location;
     }
 
-    const formattedData = superAdminAccountDataToImplementDatabase(datas);
-    // if email exists in update data, then search new email in database and it exists in database, return can't use two email response
-    if (process.env.NODE_ENV === "development") {
-      console.log("formatted", id, formattedData);
+    const formattedData: any = superAdminAccountDataToImplementDatabase(datas);
+
+    if (datas.region && typeof datas.region === "string") {
+      let regionDoc = await RegionsModels.findOne({ region: datas.region });
+
+      if (regionDoc) {
+        if (!regionDoc.dealerId) {
+          regionDoc.dealerId = [];
+        }
+
+        const objectIdToPush = id as any as mongoose.Schema.Types.ObjectId;
+
+        if (!regionDoc.dealerId.includes(objectIdToPush)) {
+          regionDoc.dealerId.push(objectIdToPush);
+        }
+
+        await regionDoc.save();
+      } else {
+        regionDoc = new RegionsModels({
+          region: datas.region,
+          dealerId: [id as any as mongoose.Schema.Types.ObjectId],
+        });
+
+        await regionDoc.save();
+      }
+
+      formattedData.region = regionDoc._id;
     }
 
     const result = await AdminUsers.findOneAndUpdate(
@@ -122,6 +170,10 @@ class AdminAccountService {
       formattedData,
       { new: true }
     );
+
+    if (process.env.NODE_ENV === "development") {
+      console.log("formatted Update Data", id, formattedData);
+    }
 
     return successResponse({
       statusCode: 200,

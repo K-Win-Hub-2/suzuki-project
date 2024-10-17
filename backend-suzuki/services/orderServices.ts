@@ -11,6 +11,7 @@ import {
 import { io } from "../app";
 import { NotificationModels } from "../models/notificationModel";
 import { CarPartStockModels } from "../models/carPartStockModel";
+import { AdminUsers } from "../models/adminUserModel";
 
 enum OrderStatus {
   In_Progress = "In Progress",
@@ -53,14 +54,36 @@ class MainOrderClass {
 
   async createOrder(data: Partial<Order>) {
     try {
-      //Generate Order Number
-      const currentDate: Date = new Date();
-      const day: String = String(currentDate.getDay()).padStart(2, "0");
-      const year: String = String(currentDate.getFullYear());
-      const month: String = String(currentDate.getMonth() + 1).padStart(2, "0");
-      const datePart: String = `${day}${month}${year}`;
+      // Generate Order Number
+      const dealer = await AdminUsers.findById(data.dealer);
 
-      const orderNumber = `Suzuki-${datePart}`;
+      if (!dealer) {
+        throw new Error("Dealer not found");
+      }
+
+      const dealerCode = dealer.code || "dealer";
+
+      const year = String(new Date().getFullYear()).slice(-2);
+
+      const lastOrder = await OrderModels.findOne({
+        orderNumber: { $regex: `^${dealerCode}` },
+        orderDate: {
+          $gte: new Date(new Date().getFullYear(), 0, 1),
+          $lt: new Date(new Date().getFullYear(), 11, 31),
+        },
+      })
+        .sort({ orderDate: -1 })
+        .exec();
+
+      let nextOrderNumber = 1;
+      if (lastOrder && lastOrder.orderNumber) {
+        const lastOrderNo = parseInt(lastOrder.orderNumber.slice(4, 9), 10);
+        nextOrderNumber = lastOrderNo + 1;
+      }
+
+      const orderNumberPart = String(nextOrderNumber).padStart(5, "0");
+
+      const orderNumber = `${dealerCode}-${orderNumberPart}-${year}`;
 
       const totalItem =
         data.smallOrder?.reduce(

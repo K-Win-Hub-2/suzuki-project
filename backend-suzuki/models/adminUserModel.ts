@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 import bcryptHelpers from "../helpers/bcryptHelper";
 import { Showrooms } from "./showroomModel";
+import { RegionsModels } from "./regionModel";
 
 interface AdminUser extends Document {
   isSuperAdmin: boolean;
@@ -14,7 +15,7 @@ interface AdminUser extends Document {
   phone: string;
   address: string;
   townShip: string;
-  region: string;
+  region?: mongoose.Schema.Types.ObjectId;
   createdAt: Date;
   isBanned: boolean;
   bannedReason?: string;
@@ -27,6 +28,7 @@ interface AdminUser extends Document {
   longitude: string;
   description: string;
   role: string;
+  shippingMethod: string[];
 }
 
 const AdminUserSchema: Schema = new Schema({
@@ -65,7 +67,8 @@ const AdminUserSchema: Schema = new Schema({
     type: String,
   },
   region: {
-    type: String,
+    type: mongoose.Types.ObjectId,
+    ref: RegionsModels,
   },
   createdAt: {
     type: Date,
@@ -102,6 +105,9 @@ const AdminUserSchema: Schema = new Schema({
   },
   role: {
     type: String,
+  },
+  shippingMethod: {
+    type: [String],
   },
 });
 

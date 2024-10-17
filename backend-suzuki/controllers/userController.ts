@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { UserAccountServiceFactory } from "../services/userAccountService";
+import { RegionsModels } from "../models/regionModel";
+import { AdminUsers } from "../models/adminUserModel";
 import mongoose from "mongoose";
 
 const account = new UserAccountServiceFactory();
@@ -44,4 +46,25 @@ export const deleteUser = async (req: Request, res: Response) => {
     .accountType(r as string)
     .delete(new mongoose.Types.ObjectId(req.params.id));
   res.status(data.statusCode).json(data);
+};
+
+export const listDealers = async (req: Request, res: Response) => {
+  const { regionId } = req.query;
+
+  const FilterQuery: any = {
+    isSuperAdmin: false,
+    isDeleted: false,
+  };
+
+  if (regionId) {
+    FilterQuery["region"] = regionId;
+  }
+
+  const dealers = await AdminUsers.find(FilterQuery);
+
+  res.status(200).json({
+    statusCode: 200,
+    message: "These are all dealers",
+    data: dealers,
+  });
 };
