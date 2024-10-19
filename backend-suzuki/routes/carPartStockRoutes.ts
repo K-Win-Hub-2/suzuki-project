@@ -9,6 +9,9 @@ import {
   readCarPartStock,
   updateCarPartStock,
   updateCarPartStockByAll,
+  CheckAllStocksByDelear,
+  CheckAllStocksByTownShipAndRegion,
+  checkStockAvailabilityController,
 } from "../controllers/carPartStockController";
 import S3UploadImage from "../lib/fileUploader";
 import { createWithExcel } from "../controllers/excelController";
@@ -52,4 +55,16 @@ module.exports = (app: Express): void => {
   app
     .route("/api/v1/admin/excel/import")
     .post(uploadStorage.single("excel"), catchError(createWithExcel));
+
+  app.get("/api/v1/check-stocks-dealer", catchError(CheckAllStocksByDelear));
+
+  app.get(
+    "/api/v1/check-stocks-township-region",
+    catchError(CheckAllStocksByTownShipAndRegion)
+  );
+
+  app.get(
+    "/api/v1/check-stocks-available",
+    catchError(checkStockAvailabilityController)
+  );
 };
