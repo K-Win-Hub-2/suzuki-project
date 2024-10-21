@@ -152,9 +152,29 @@ export const checkStockAvailability = async (
     }
 
     if (stockDocs.length > 1) {
-      multiDealerStockResults.push(...stockDocs);
+      multiDealerStockResults.push(
+        ...stockDocs.map((stock) => ({
+          ...stock.toObject(),
+          status:
+            stock.totalQuantity >= requestedQuantity
+              ? "available"
+              : stock.totalQuantity > 0
+              ? "partial available"
+              : "not available",
+        }))
+      );
     } else {
-      singleDealerStockResults.push(...stockDocs);
+      singleDealerStockResults.push(
+        ...stockDocs.map((stock) => ({
+          ...stock.toObject(),
+          status:
+            stock.totalQuantity >= requestedQuantity
+              ? "available"
+              : stock.totalQuantity > 0
+              ? "partial available"
+              : "not available",
+        }))
+      );
     }
 
     for (const stock of stockDocs) {
