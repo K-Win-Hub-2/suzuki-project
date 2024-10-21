@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { UserAccountServiceFactory } from "../services/userAccountService";
-import { RegionsModels } from "../models/regionModel";
 import { AdminUsers } from "../models/adminUserModel";
 import mongoose from "mongoose";
 
@@ -72,5 +71,20 @@ export const listDealers = async (req: Request, res: Response) => {
     statusCode: 200,
     message: "These are all dealers",
     data: dealers,
+  });
+};
+
+export const ListShippingMethod = async (req: Request, res: Response) => {
+  const { dealerId } = req.query;
+
+  const shippingMethod = await AdminUsers.find({
+    _id: dealerId,
+    isDeleted: false,
+  }).select("shippingMethod");
+
+  res.status(200).json({
+    statusCode: 200,
+    message: "These are all shipping methods",
+    data: shippingMethod,
   });
 };

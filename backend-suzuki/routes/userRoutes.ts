@@ -1,4 +1,4 @@
-import { Express, Request, Response } from "express";
+import { Express } from "express";
 import { verifyToken } from "../middlewares/verifyToken";
 import {
   createUser,
@@ -7,6 +7,7 @@ import {
   updateUser,
   deleteUser,
   listDealers,
+  ListShippingMethod,
 } from "../controllers/userController";
 import { checkAdminOrSelf, checkAdminType } from "../validators/authCheck";
 import S3UploadImage from "../lib/fileUploader";
@@ -28,5 +29,9 @@ module.exports = (app: Express): void => {
     .get(verifyToken, catchError(readUser))
     .delete(verifyToken, checkAdminOrSelf, catchError(deleteUser));
 
-  app.route("/api/v1/list-dealers").get(catchError(listDealers));
+  app.route("/api/v1/list-dealers").get(verifyToken, catchError(listDealers));
+
+  app
+    .route("/api/v1/shipping-method")
+    .get(verifyToken, catchError(ListShippingMethod));
 };
