@@ -3,6 +3,7 @@ import bcryptHelpers from "../helpers/bcryptHelper";
 import { Showrooms } from "./showroomModel";
 import { TownShipModels } from "./newTownShipModel";
 import { RegionsModels } from "./regionModel";
+import { RoleCategories } from "./roleCategoriesModel";
 
 interface AdminUser extends Document {
   data: mongoose.Types.ObjectId;
@@ -30,6 +31,7 @@ interface AdminUser extends Document {
   longitude: string;
   description: string;
   role: string;
+  authorizedRole?: mongoose.Schema.Types.ObjectId;
   shippingMethod: string[];
 }
 
@@ -111,6 +113,10 @@ const AdminUserSchema: Schema = new Schema({
   },
   shippingMethod: {
     type: [String],
+  },
+  authorizedRole: {
+    type: mongoose.Types.ObjectId,
+    ref: RoleCategories,
   },
 });
 

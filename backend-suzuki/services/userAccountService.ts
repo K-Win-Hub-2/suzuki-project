@@ -39,7 +39,7 @@ class AdminAccountService {
   }
 
   public async read(datas: Partial<UserDatas>) {
-    const result = await AdminUsers.findOne(datas);
+    const result = await AdminUsers.findOne(datas).populate("authorizedRole");
     return result;
   }
 
