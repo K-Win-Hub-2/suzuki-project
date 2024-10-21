@@ -71,33 +71,37 @@ class AdminAccountService {
         data: null,
       });
 
-    if (!this.isSuperAdmin && data.region && typeof data.region === "string") {
-      let regionDoc = await RegionsModels.findOne({ region: data.region });
-
-      if (regionDoc) {
-        if (!regionDoc.dealerId) {
-          regionDoc.dealerId = [];
-        }
-
-        const objectIdToPush =
-          data._id as any as mongoose.Schema.Types.ObjectId;
-
-        if (!regionDoc.dealerId.includes(objectIdToPush)) {
-          regionDoc.dealerId.push(objectIdToPush);
-        }
-
-        await regionDoc.save();
-
-        data.region = regionDoc._id as any as mongoose.Schema.Types.ObjectId;
-      } else {
-        regionDoc = new RegionsModels({
-          region: data.region,
-          dealerId: [data._id as any as mongoose.Schema.Types.ObjectId],
+    if (
+      !this.isSuperAdmin &&
+      data.shippingMethod &&
+      typeof data.shippingMethod === "string"
+    ) {
+      try {
+        data.shippingMethod = JSON.parse(data.shippingMethod);
+      } catch (error) {
+        return errorResponse({
+          statusCode: 201,
+          message: "Invalid Shipping Method",
+          data: null,
         });
+      }
+    }
 
-        await regionDoc.save();
-
+    if (!this.isSuperAdmin && data.region && typeof data.region === "string") {
+      try {
+        const regionDoc = await RegionsModels.findOneAndUpdate(
+          { region: data.region },
+          {},
+          { new: true, upsert: true }
+        );
         data.region = regionDoc._id as any as mongoose.Schema.Types.ObjectId;
+      } catch (error) {
+        console.error("Error updating region document:", error);
+        return errorResponse({
+          statusCode: 500,
+          message: "Failed to update region",
+          data: null,
+        });
       }
     }
 
@@ -106,36 +110,21 @@ class AdminAccountService {
       data.townShip &&
       typeof data.townShip === "string"
     ) {
-      let townShipDoc = await TownShipModels.findOne({
-        townShip: data.townShip,
-      });
-
-      if (townShipDoc) {
-        if (!townShipDoc.dealerId) {
-          townShipDoc.dealerId = [];
-        }
-
-        const townShipIdToPush =
-          data._id as any as mongoose.Schema.Types.ObjectId;
-
-        if (!townShipDoc.dealerId.includes(townShipIdToPush)) {
-          townShipDoc.dealerId.push(townShipIdToPush);
-        }
-
-        await townShipDoc.save();
-
+      try {
+        const townShipDoc = await TownShipModels.findOneAndUpdate(
+          { townShip: data.townShip },
+          {},
+          { new: true, upsert: true }
+        );
         data.townShip =
           townShipDoc._id as any as mongoose.Schema.Types.ObjectId;
-      } else {
-        townShipDoc = new TownShipModels({
-          townShip: data.townShip,
-          dealerId: [data._id as any as mongoose.Schema.Types.ObjectId],
+      } catch (error) {
+        console.error("Error updating township document:", error);
+        return errorResponse({
+          statusCode: 500,
+          message: "Failed to update township",
+          data: null,
         });
-
-        await townShipDoc.save();
-
-        data.townShip =
-          townShipDoc._id as any as mongoose.Schema.Types.ObjectId;
       }
     }
 
@@ -164,11 +153,7 @@ class AdminAccountService {
     });
   }
 
-  public async updateById(
-    file: any,
-    id: mongoose.Types.ObjectId,
-    datas: UserDatas
-  ) {
+  public async updateById(file: any, id: mongoose.Types.ObjectId, datas: any) {
     datas.isSuperAdmin = this.isSuperAdmin;
 
     if (file) {
@@ -177,60 +162,57 @@ class AdminAccountService {
 
     const formattedData: any = superAdminAccountDataToImplementDatabase(datas);
 
-    if (datas.region && typeof datas.region === "string") {
-      let regionDoc = await RegionsModels.findOne({ region: datas.region });
-
-      if (regionDoc) {
-        if (!regionDoc.dealerId) {
-          regionDoc.dealerId = [];
-        }
-
-        const objectIdToPush = id as any as mongoose.Schema.Types.ObjectId;
-
-        if (!regionDoc.dealerId.includes(objectIdToPush)) {
-          regionDoc.dealerId.push(objectIdToPush);
-        }
-
-        await regionDoc.save();
-      } else {
-        regionDoc = new RegionsModels({
-          region: datas.region,
-          dealerId: [id as any as mongoose.Schema.Types.ObjectId],
+    if (
+      !this.isSuperAdmin &&
+      datas.shippingMethod &&
+      typeof datas.shippingMethod === "string"
+    ) {
+      try {
+        datas.shippingMethod = JSON.parse(datas.shippingMethod);
+      } catch (error) {
+        return errorResponse({
+          statusCode: 201,
+          message: "Invalid Shipping Method",
+          data: null,
         });
-
-        await regionDoc.save();
       }
+    }
 
-      formattedData.region = regionDoc._id;
+    if (datas.region && typeof datas.region === "string") {
+      try {
+        const regionDoc = await RegionsModels.findOneAndUpdate(
+          { region: datas.region },
+          {},
+          { new: true, upsert: true }
+        );
+        formattedData.region = regionDoc._id as mongoose.Schema.Types.ObjectId;
+      } catch (error) {
+        console.error("Error updating region document:", error);
+        return errorResponse({
+          statusCode: 500,
+          message: "Failed to update region",
+          data: null,
+        });
+      }
     }
 
     if (datas.townShip && typeof datas.townShip === "string") {
-      let townShipDoc = await TownShipModels.findOne({
-        townShip: datas.townShip,
-      });
-
-      if (townShipDoc) {
-        if (!townShipDoc.dealerId) {
-          townShipDoc.dealerId = [];
-        }
-
-        const townShipIdToPush = id as any as mongoose.Schema.Types.ObjectId;
-
-        if (!townShipDoc.dealerId.includes(townShipIdToPush)) {
-          townShipDoc.dealerId.push(townShipIdToPush);
-        }
-
-        await townShipDoc.save();
-      } else {
-        townShipDoc = new TownShipModels({
-          townShip: datas.townShip,
-          dealerId: [id as any as mongoose.Schema.Types.ObjectId],
+      try {
+        const townShipDoc = await TownShipModels.findOneAndUpdate(
+          { townShip: datas.townShip },
+          {},
+          { new: true, upsert: true }
+        );
+        formattedData.townShip =
+          townShipDoc._id as mongoose.Schema.Types.ObjectId;
+      } catch (error) {
+        console.error("Error updating township document:", error);
+        return errorResponse({
+          statusCode: 500,
+          message: "Failed to update township",
+          data: null,
         });
-
-        await townShipDoc.save();
       }
-
-      formattedData.townShip = townShipDoc._id;
     }
 
     const result = await AdminUsers.findOneAndUpdate(

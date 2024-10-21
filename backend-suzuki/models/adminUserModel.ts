@@ -1,10 +1,11 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 import bcryptHelpers from "../helpers/bcryptHelper";
 import { Showrooms } from "./showroomModel";
-import { RegionsModels } from "./regionModel";
 import { TownShipModels } from "./newTownShipModel";
+import { RegionsModels } from "./regionModel";
 
 interface AdminUser extends Document {
+  data: mongoose.Types.ObjectId;
   isSuperAdmin: boolean;
   // businessEntityName: mongoose.Types.ObjectId;
   code: string;

@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
+import { AdminUsers } from "./adminUserModel";
 
 enum RegionEnum {
   Mandalay = "Mandalay",
@@ -36,7 +37,7 @@ const RegionSchema: Schema<Region> = new Schema({
   dealerId: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "adminusers",
+      ref: AdminUsers,
     },
   ],
 });
