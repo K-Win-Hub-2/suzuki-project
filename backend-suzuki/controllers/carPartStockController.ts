@@ -78,8 +78,8 @@ export const checkStockAvailabilityController = async (
   req: Request,
   res: Response
 ) => {
-  const { dealerId, stockItems } = req.body;
-  const data = await checkStockAvailability(dealerId, stockItems);
+  const { stockItems } = req.body;
+  const data = await checkStockAvailability(stockItems);
 
   res.status(200).json(data);
 };

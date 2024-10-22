@@ -19,9 +19,14 @@ export const checkStockByDealerAndItems = async (
       name: new mongoose.Types.ObjectId(name),
       dealerId,
       isDeleted: false,
+    }).populate({
+      path: "dealerId",
+      select: "name region townShip",
+      populate: [
+        { path: "region", select: "region" },
+        { path: "townShip", select: "townShip" },
+      ],
     });
-
-    console.log("stockDocs", stockDocs);
 
     if (stockDocs.length === 0) {
       availableStockResults.push({
@@ -40,7 +45,6 @@ export const checkStockByDealerAndItems = async (
       let status = "available";
       let quantityProvided = requestedQuantity;
 
-      // Determine availability status
       if (availableQuantity === 0) {
         status = "not available";
         quantityProvided = 0;
@@ -159,17 +163,17 @@ export const FilterStockByTownShipAndRegion = async (
 };
 
 export const checkStockAvailability = async (
-  dealerId: string,
-  stockItems: Array<any>
+  stockItems: Array<{
+    partNumber: string;
+    name: string;
+    requestedQuantity: number;
+  }>
 ) => {
-  let availableStockResults: any[] = [];
-  let multiDealerStockResults: any[] = [];
-  let singleDealerStockResults: any[] = [];
+  const availableStockResults: any[] = [];
 
-  for (const items of stockItems) {
-    const { name, requestedQuantity, partNumber } = items;
+  for (const item of stockItems) {
+    const { name, requestedQuantity, partNumber } = item;
 
-    // we need to select some fields for specific requirements
     const stockDocs = await CarPartStockModels.find({
       partNumber,
       name: new mongoose.Types.ObjectId(name),
@@ -177,6 +181,10 @@ export const checkStockAvailability = async (
     }).populate({
       path: "dealerId",
       select: "name region townShip",
+      populate: [
+        { path: "region", select: "region" },
+        { path: "townShip", select: "townShip" },
+      ],
     });
 
     if (stockDocs.length === 0) {
@@ -191,43 +199,10 @@ export const checkStockAvailability = async (
       continue;
     }
 
-    if (stockDocs.length > 1) {
-      multiDealerStockResults.push(
-        ...stockDocs.map((stock) => ({
-          ...stock.toObject(),
-          status:
-            stock.totalQuantity >= requestedQuantity
-              ? "available"
-              : stock.totalQuantity > 0
-              ? "partial available"
-              : "not available",
-        }))
-      );
-    } else {
-      singleDealerStockResults.push(
-        ...stockDocs.map((stock) => ({
-          ...stock.toObject(),
-          status:
-            stock.totalQuantity >= requestedQuantity
-              ? "available"
-              : stock.totalQuantity > 0
-              ? "partial available"
-              : "not available",
-        }))
-      );
-    }
-
     for (const stock of stockDocs) {
       const availableQuantity = stock.totalQuantity;
-
-      let status;
-      let quantityProvided;
-
-      if (dealerId) {
-        if (!stock.dealerId || stock.dealerId.toString() !== dealerId) {
-          continue;
-        }
-      }
+      let status: string;
+      let quantityProvided: number;
 
       if (availableQuantity >= requestedQuantity) {
         status = "available";
@@ -245,17 +220,11 @@ export const checkStockAvailability = async (
         name,
         requestedQuantity,
         status,
-        availableQuantity: quantityProvided,
+        availableQuantity: stock.totalQuantity,
         dealer: stock.dealerId,
       });
     }
-
-    return {
-      availableStockResults,
-      singleDealerStockResults:
-        singleDealerStockResults.length > 0 ? singleDealerStockResults : null,
-      multiDealerStockResults:
-        multiDealerStockResults.length > 0 ? multiDealerStockResults : null,
-    };
   }
+
+  return availableStockResults;
 };
