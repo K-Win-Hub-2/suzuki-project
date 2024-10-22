@@ -51,6 +51,37 @@ export const createRoleOnly = async (req: Request, res: Response) => {
   }
 };
 
+export const updateRole = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { labels, subLabels } = req.body;
+
+    const role = await RoleCategories.findById(id);
+
+    if (!role) {
+      return res.status(404).json({ error: "Role not found" });
+    }
+
+    if (labels && Array.isArray(labels)) {
+      role.labels = labels;
+    }
+
+    if (subLabels && Array.isArray(subLabels)) {
+      role.subLabels = subLabels;
+    }
+
+    const updatedRole = await role.save();
+
+    return res.status(200).json({
+      message: "Role updated successfully",
+      data: updatedRole,
+    });
+  } catch (error) {
+    console.error("Error updating role:", error);
+    return res.status(500).json({ error: "Failed to update role" });
+  }
+};
+
 export const getRole = async (req: Request, res: Response) => {
   try {
     const data = await RoleCategories.find({ isDeleted: false });

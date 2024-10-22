@@ -62,14 +62,14 @@ class AdminAccountService {
       console.log("req data", data);
     }
 
-    const searchAccount = await AdminUsers.findOne({ email: data.email });
+    // const searchAccount = await AdminUsers.findOne({ email: data.email });
 
-    if (searchAccount)
-      return errorResponse({
-        statusCode: 201,
-        message: "This email is already taken",
-        data: null,
-      });
+    // if (!searchAccount)
+    //   return errorResponse({
+    //     statusCode: 404,
+    //     message: "This email is already taken",
+    //     data: null,
+    //   });
 
     if (
       !this.isSuperAdmin &&
@@ -213,6 +213,10 @@ class AdminAccountService {
           data: null,
         });
       }
+    }
+
+    if (datas.labels && Array.isArray(datas.labels)) {
+      formattedData.labels = datas.labels;
     }
 
     const result = await AdminUsers.findOneAndUpdate(

@@ -6,6 +6,7 @@ import {
   createRole,
   createRoleOnly,
   getRole,
+  updateRole,
 } from "../controllers/roleCategoriesController";
 
 module.exports = (app: Express): void => {
@@ -16,4 +17,8 @@ module.exports = (app: Express): void => {
     .post(verifyToken, catchError(createRoleOnly));
 
   app.route("/api/v1/roleCategories").get(verifyToken, catchError(getRole));
+
+  app
+    .route("/api/v1/roleCategories/:id")
+    .put(verifyToken, catchError(updateRole));
 };
