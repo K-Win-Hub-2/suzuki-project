@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import CarPartStock from "../services/carPartStockService";
 import mongoose from "mongoose";
 import {
-  FilterStockByDelear,
+  checkStockByDealerAndItems,
   FilterStockByTownShipAndRegion,
   checkStockAvailability,
 } from "../helpers/stockCheckHelper";
@@ -52,7 +52,10 @@ export const deleteCarPartStock = async (req: Request, res: Response) => {
 };
 
 export const CheckAllStocksByDelear = async (req: Request, res: Response) => {
-  const data = await FilterStockByDelear(req.query.dealerId as string);
+  const data = await checkStockByDealerAndItems(
+    req.body.dealerId,
+    req.body.stockItems
+  );
   res.status(200).json(data);
 };
 

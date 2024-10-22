@@ -1,26 +1,66 @@
 import { CarPartStockModels } from "../models/carPartStockModel";
 import mongoose from "mongoose";
 
-export const FilterStockByDelear = async (dealerId: string) => {
-  let filterQuery: any = { dealerId: dealerId, isDeleted: false };
+export const checkStockByDealerAndItems = async (
+  dealerId: string,
+  stockItems: Array<{
+    partNumber: string;
+    name: string;
+    requestedQuantity: number;
+  }>
+) => {
+  const availableStockResults: any[] = [];
 
-  let stockDoc = await CarPartStockModels.find(filterQuery)
-    .select(
-      "partNumber partName colorName colorCode url totalQuantity originalPrice discountPrice promotionPrice description discountPercentage"
-    )
-    .populate({
-      path: "name",
-      select: "name url date originalPrice discountPrice promotionPrice",
-      populate: {
-        path: "car_part_category car_model",
-      },
-    })
-    .populate({
-      path: "dealerId",
-      select: "-password",
+  for (const item of stockItems) {
+    const { partNumber, name, requestedQuantity } = item;
+
+    const stockDocs = await CarPartStockModels.find({
+      partNumber,
+      name: new mongoose.Types.ObjectId(name),
+      dealerId,
+      isDeleted: false,
     });
 
-  return stockDoc;
+    console.log("stockDocs", stockDocs);
+
+    if (stockDocs.length === 0) {
+      availableStockResults.push({
+        partNumber,
+        name,
+        requestedQuantity,
+        status: "not available",
+        availableQuantity: 0,
+        dealer: dealerId,
+      });
+      continue;
+    }
+
+    for (const stock of stockDocs) {
+      const availableQuantity = stock.totalQuantity;
+      let status = "available";
+      let quantityProvided = requestedQuantity;
+
+      // Determine availability status
+      if (availableQuantity === 0) {
+        status = "not available";
+        quantityProvided = 0;
+      } else if (availableQuantity < requestedQuantity) {
+        status = "partial available";
+        quantityProvided = availableQuantity;
+      }
+
+      availableStockResults.push({
+        partNumber,
+        name,
+        requestedQuantity,
+        status,
+        availableQuantity: stock.totalQuantity,
+        dealer: stock.dealerId,
+      });
+    }
+  }
+
+  return availableStockResults;
 };
 
 export const FilterStockByTownShipAndRegion = async (
