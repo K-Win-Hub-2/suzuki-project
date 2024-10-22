@@ -12,6 +12,8 @@ import { io } from "../app";
 import { NotificationModels } from "../models/notificationModel";
 import { CarPartStockModels } from "../models/carPartStockModel";
 import { AdminUsers } from "../models/adminUserModel";
+import { CustomNotificationModel } from "../models/customNotification";
+import "dotenv/config";
 
 enum OrderStatus {
   In_Progress = "In Progress",
@@ -114,23 +116,37 @@ class MainOrderClass {
 
       const result = await OrderModels.create(orderData);
 
-      console.log("Order created successfully");
+      if (process.env.NODE_ENV === "development") {
+        console.log("Order created", result);
+      }
 
-      io.emit("orderCreated", {
-        message: "New Order Created",
-        order: result,
+      const customNotification = await CustomNotificationModel.findOne({
+        type: "CREATE",
+        isDeleted: false,
+        isChoose: true,
       });
+
+      const notificationMessage = customNotification?.message
+        .replace(`${orderNumber}`, orderNumber)
+        .replace(`${dealer}`, dealer.name);
 
       // Create notification
       const notification = new NotificationModels({
-        title: "New Order Created",
-        message: `Order ${result.orderNumber} has been placed`,
+        title: customNotification?.title || "New Order Created",
+        message:
+          notificationMessage || `Order ${result.orderNumber} has been placed`,
         order_id: result._id,
         dealer_id: result.dealer,
         customer_id: result.customer,
       });
 
       await notification.save();
+
+      io.emit("customNotification", {
+        message:
+          notificationMessage || `Order ${result.orderNumber} has been placed`,
+        order: result,
+      });
 
       return successResponse({
         statusCode: 200,

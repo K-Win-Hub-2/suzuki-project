@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { UserAccountServiceFactory } from "../services/userAccountService";
 import { AdminUsers } from "../models/adminUserModel";
+import { RegionsModels } from "../models/regionModel";
+import { TownShipModels } from "../models/newTownShipModel";
 import mongoose from "mongoose";
 
 const account = new UserAccountServiceFactory();
@@ -86,5 +88,25 @@ export const ListShippingMethod = async (req: Request, res: Response) => {
     statusCode: 200,
     message: "These are all shipping methods",
     data: shippingMethod,
+  });
+};
+
+export const ListAllRegions = async (req: Request, res: Response) => {
+  const regions = await RegionsModels.find({}).select("region");
+
+  res.status(200).json({
+    statusCode: 200,
+    message: "These are all regions",
+    data: regions,
+  });
+};
+
+export const ListAllTownShips = async (req: Request, res: Response) => {
+  const townShips = await TownShipModels.find({}).select("townShip");
+
+  res.status(200).json({
+    statusCode: 200,
+    message: "These are all townships",
+    data: townShips,
   });
 };

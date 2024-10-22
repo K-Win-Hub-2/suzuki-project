@@ -33,6 +33,7 @@ interface AdminUser extends Document {
   role: string;
   authorizedRole?: mongoose.Schema.Types.ObjectId;
   shippingMethod: string[];
+  labels: string[];
 }
 
 const AdminUserSchema: Schema = new Schema({
@@ -117,6 +118,9 @@ const AdminUserSchema: Schema = new Schema({
   authorizedRole: {
     type: mongoose.Types.ObjectId,
     ref: RoleCategories,
+  },
+  labels: {
+    type: [String],
   },
 });
 

@@ -12,7 +12,7 @@ interface SubLabel {
 
 interface RoleCategories extends Document {
   labels: string[];
-  subLabels: SubLabel[];
+  subLabels?: SubLabel[];
   isDeleted: boolean;
   code?: string;
   dealerId?: mongoose.Schema.Types.ObjectId;

@@ -9,10 +9,6 @@ export const createRole = async (req: Request, res: Response) => {
       code: string;
       saveLabel: {
         labels: string[];
-        subLabels: Array<{
-          label: string;
-          subMenu: Array<{ label: string }>;
-        }>;
       };
       [key: string]: any;
     };
@@ -23,23 +19,12 @@ export const createRole = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Dealer not found" });
     }
 
-    const roleCategoryData = {
-      ...rest,
-      dealerId: dealerDoc._id,
-      labels: saveLabel.labels,
-      subLabels: saveLabel.subLabels.map((subLabel) => ({
-        label: subLabel.label,
-        subMenu: subLabel.subMenu.map((subMenu) => ({ label: subMenu.label })),
-      })),
-      code: code,
-    };
-
-    const data = await RoleCategories.create(roleCategoryData);
-
-    dealerDoc.authorizedRole = data._id as mongoose.Schema.Types.ObjectId;
+    dealerDoc.labels = saveLabel.labels;
     await dealerDoc.save();
 
-    res.status(201).json(data);
+    res.status(201).json({
+      message: "Role created successfully",
+    });
   } catch (error) {
     console.error(error);
     res

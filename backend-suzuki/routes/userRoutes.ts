@@ -8,6 +8,8 @@ import {
   deleteUser,
   listDealers,
   ListShippingMethod,
+  ListAllRegions,
+  ListAllTownShips,
 } from "../controllers/userController";
 import { checkAdminOrSelf, checkAdminType } from "../validators/authCheck";
 import S3UploadImage from "../lib/fileUploader";
@@ -34,4 +36,12 @@ module.exports = (app: Express): void => {
   app
     .route("/api/v1/shipping-method")
     .get(verifyToken, catchError(ListShippingMethod));
+
+  app
+    .route("/api/v1/list-regions")
+    .get(verifyToken, catchError(ListAllRegions));
+
+  app
+    .route("/api/v1/list-townships")
+    .get(verifyToken, catchError(ListAllTownShips));
 };

@@ -10,6 +10,8 @@ interface Notification extends Document {
   dealer_id: mongoose.Schema.Types.ObjectId;
   isRead: boolean;
   customer_id: mongoose.Schema.Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const NotificationSchema: Schema<Notification> = new Schema({
@@ -34,6 +36,14 @@ const NotificationSchema: Schema<Notification> = new Schema({
   isRead: {
     type: Boolean,
     default: false,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 
